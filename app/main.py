@@ -1,6 +1,7 @@
 """OpenVPN control panel (port 8139)."""
 from __future__ import annotations
 
+import html
 import json
 import re
 import uuid
@@ -257,13 +258,18 @@ def subscription(client_id: str) -> PlainTextResponse:
     return _subscription_response(rec)
 
 
+def _panel_version_label() -> str:
+    v = _app_version().strip() or "0.0.0"
+    return v if v.startswith("v") else f"v{v}"
+
+
 @app.get("/", response_class=HTMLResponse)
 def dashboard() -> HTMLResponse:
-    html = DASHBOARD_HTML.replace(
+    page = DASHBOARD_HTML.replace(
         "__SUBSCRIPTION_ORIGIN_JSON__",
         json.dumps(subscription_public_origin()),
-    )
-    return HTMLResponse(html)
+    ).replace("__PANEL_VERSION__", html.escape(_panel_version_label()))
+    return HTMLResponse(page)
 
 
 DASHBOARD_HTML = """<!DOCTYPE html>
@@ -310,6 +316,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       white-space: nowrap;
     }
     .brand svg { width: 28px; height: 28px; }
+    .brand-version {
+      font-weight: 500;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-left: 0.4rem;
+      letter-spacing: 0.02em;
+    }
     .token-row {
       display: flex;
       align-items: center;
@@ -447,7 +460,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <path d="M12 8v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         <circle cx="12" cy="16" r="1.2" fill="currentColor"/>
       </svg>
-      Ruoxue VPN
+      Ruoxue VPN<span class="brand-version">__PANEL_VERSION__</span>
     </div>
     <div class="token-row">
       <label for="tok">Panel token</label>
