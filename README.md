@@ -46,11 +46,19 @@ Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (s
 Download `ovpn-panel-client_*_all.deb` from [Releases](https://github.com/alex20251206-stack/rx-vpn/releases), then:
 
 ```bash
+<<<<<<< HEAD
 sudo apt install ./ovpn-panel-client_*_all.deb
 sudo ovpn-panel-client set-url 'http://<OVPN_REMOTE_HOST>:8139/api/subscription/<client-id>?token=<panel-token>'
 ```
 
 Use the exact URL copied from the panel (it matches **`OVPN_REMOTE_HOST`** and optional **`PANEL_PUBLIC_*`** from `.env`).
+=======
+sudo apt install ./rx-vpn-ubuntu_*_all.deb
+sudo rx-vpn-ubuntu set-url 'https://<server-ip>:8139/api/subscription/<client-id>?token=<panel-token>'
+```
+
+Check status: `rx-vpn-ubuntu status`. Follow combined logs: `sudo rx-vpn-ubuntu logs`.
+>>>>>>> 8a1776fa307b19d90999b680fd9e42539450d41f
 
 ### Build and install from source
 

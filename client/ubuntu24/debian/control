@@ -1,4 +1,4 @@
-Source: ovpn-panel-client
+Source: rx-vpn-ubuntu
 Section: net
 Priority: optional
 Maintainer: Ruoxue <ruoxue@users.noreply.github.com>
@@ -6,7 +6,7 @@ Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.2
 Rules-Requires-Root: no
 
-Package: ovpn-panel-client
+Package: rx-vpn-ubuntu
 Architecture: all
 Depends: openvpn (>= 2.5), stunnel4, curl, ca-certificates, ${misc:Depends}
 Description: Ruoxue — OpenVPN panel CLI (Ubuntu 24.04)

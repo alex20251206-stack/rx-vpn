@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild ovpn-panel-client .deb from client/ubuntu24/ and install it (development loop).
+# Rebuild rx-vpn-ubuntu .deb from client/ubuntu24/ and install it (development loop).
 # Usage: from repo root: ./scripts/dev-install-client.sh
 #        or: bash scripts/dev-install-client.sh
 
@@ -27,9 +27,9 @@ echo "==> dpkg-buildpackage -b (${PKG_DIR})"
 )
 
 shopt -s nullglob
-debs=( "${OUT_DIR}"/ovpn-panel-client_*_all.deb )
+debs=( "${OUT_DIR}"/rx-vpn-ubuntu_*_all.deb )
 if [[ "${#debs[@]}" -eq 0 ]]; then
-  echo "error: no ovpn-panel-client_*_all.deb under ${OUT_DIR}/" >&2
+  echo "error: no rx-vpn-ubuntu_*_all.deb under ${OUT_DIR}/" >&2
   exit 1
 fi
 # Pick highest version if several .deb are present
@@ -37,4 +37,4 @@ DEB="$(printf '%s\n' "${debs[@]}" | sort -V | tail -n 1)"
 echo "==> apt install ${DEB}"
 sudo apt install -y "${DEB}"
 
-echo "==> done: $(command -v ovpn-panel-client)"
+echo "==> done: $(command -v rx-vpn-ubuntu)"

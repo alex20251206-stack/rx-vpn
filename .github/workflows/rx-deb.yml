@@ -1,4 +1,4 @@
-# Build client .deb (binary). Output: ovpn-panel-client_*_all.deb at repository root.
+# Build client .deb (binary). Output: rx-vpn-ubuntu_*_all.deb under client/.
 # Source: client/ubuntu24/ (Ubuntu 24.04 packaging).
 # For apt install on other machines you still need a signed APT repo (PPA, reprepro+Pages, Cloudsmith, etc.).
 
