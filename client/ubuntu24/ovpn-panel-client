@@ -15,6 +15,8 @@ readonly STUNNEL_CONF="/etc/stunnel/${CONF_BASENAME}.conf"
 readonly OVPN_UNIT="openvpn-client@${CONF_BASENAME}.service"
 readonly OVPN_DROPIN_DIR="/etc/systemd/system/openvpn-client@${CONF_BASENAME}.service.d"
 readonly OVPN_DROPIN="${OVPN_DROPIN_DIR}/stunnel.conf"
+# Stunnel + OpenVPN append to the same file (set OVPN_UNIFIED_LOG to override).
+readonly UNIFIED_LOG="${OVPN_UNIFIED_LOG:-/var/log/rx-vpn/client.log}"
 
 usage() {
   cat <<'EOF'
@@ -25,12 +27,14 @@ Usage: ovpn-panel-client <command>
                   enable and start both systemd units.
   refresh         Re-download and restart stunnel + OpenVPN.
   status          Show saved URL, ports, and unit states.
+  logs            Follow unified log (stunnel + OpenVPN) — tail -f.
   disable         Stop and disable OpenVPN and stunnel units (configs kept).
 
 Environment:
   OVPN_CONF_BASENAME   Profile name without .conf (default: rx).
   OVPN_LOCAL_PORT      Local TCP port for OpenVPN (default: 11941). Saved
                        in /etc/rx-vpn/local.port after set-url.
+  OVPN_UNIFIED_LOG     Path for combined log (default: /var/log/rx-vpn/client.log).
 
 Data flow: OpenVPN -> 127.0.0.1:<local> -> stunnel -> TLS -> server:443 -> stunnel -> OpenVPN server.
 
@@ -118,6 +122,33 @@ _rewrite_ovpn_local_remote() {
   chmod 0644 "${dst}"
 }
 
+_ensure_unified_log() {
+  install -d -m 0755 "$(dirname "${UNIFIED_LOG}")"
+  : >> "${UNIFIED_LOG}"
+  chmod 0644 "${UNIFIED_LOG}"
+}
+
+# Remove prior log-append lines, then add one right after the first "client" line.
+_inject_ovpn_unified_log() {
+  local conf="$1"
+  local log="$2"
+  grep -vE '^[[:space:]]*log-append[[:space:]]' "${conf}" > "${conf}.strip"
+  mv -f "${conf}.strip" "${conf}"
+  awk -v lf="${log}" '
+    /^[[:space:]]*client[[:space:]]*$/ {
+      print
+      print "log-append " lf
+      next
+    }
+    { print }
+  ' "${conf}" > "${conf}.tmp"
+  mv -f "${conf}.tmp" "${conf}"
+  if ! grep -qF "log-append ${log}" "${conf}"; then
+    echo "log-append ${log}" >> "${conf}"
+  fi
+  chmod 0644 "${conf}"
+}
+
 _write_stunnel_conf() {
   local connect_host="$1" connect_port="$2" lp="$3"
   install -d -m 0755 /etc/stunnel
@@ -126,6 +157,7 @@ _write_stunnel_conf() {
 ; Managed by ovpn-panel-client — do not edit by hand unless you know the layout.
 foreground = no
 debug = notice
+output = ${UNIFIED_LOG}
 
 [openvpn]
 client = yes
@@ -173,11 +205,13 @@ _fetch_and_install() {
   REMOTE_PORT=""
   _parse_remote "${tmp}"
 
+  _ensure_unified_log
   _extract_ca_from_ovpn "${tmp}" "${CA_FILE}"
   _write_stunnel_conf "${REMOTE_HOST}" "${REMOTE_PORT}" "${lp}"
 
   install -d -m 0755 /etc/openvpn/client
   _rewrite_ovpn_local_remote "${tmp}" "${lp}" "${CLIENT_CONF}"
+  _inject_ovpn_unified_log "${CLIENT_CONF}" "${UNIFIED_LOG}"
   rm -f "${tmp}"
 
   _write_ovpn_dropin
@@ -212,6 +246,7 @@ cmd_set_url() {
   systemctl restart "${OVPN_UNIT}"
   echo "Stunnel: ${STUNNEL_CONF} -> ${STUNNEL_UNIT}"
   echo "OpenVPN: ${CLIENT_CONF} -> ${OVPN_UNIT} (remote 127.0.0.1:$(_local_port))"
+  echo "Unified log: ${UNIFIED_LOG}  (ovpn-panel-client logs)"
 }
 
 cmd_refresh() {
@@ -222,10 +257,12 @@ cmd_refresh() {
   systemctl restart "${STUNNEL_UNIT}"
   systemctl restart "${OVPN_UNIT}"
   echo "Refreshed configs and restarted ${STUNNEL_UNIT} and ${OVPN_UNIT}"
+  echo "Unified log: ${UNIFIED_LOG}"
 }
 
 cmd_status() {
   echo "Local OpenVPN port: $(_local_port) (see ${LOCAL_PORT_FILE})"
+  echo "Unified log: ${UNIFIED_LOG}"
   if [[ -f "${URL_FILE}" ]]; then
     echo "Subscription URL: ${URL_FILE} (mode $(stat -c '%a' "${URL_FILE}"))"
   else
@@ -246,12 +283,22 @@ cmd_disable() {
   echo "Stopped and disabled ${OVPN_UNIT} and ${STUNNEL_UNIT}"
 }
 
+cmd_logs() {
+  if [[ ! -f "${UNIFIED_LOG}" ]]; then
+    echo "error: no log file yet (${UNIFIED_LOG}). Run set-url first." >&2
+    exit 1
+  fi
+  echo "Following ${UNIFIED_LOG} (Ctrl+C to stop)"
+  tail -f "${UNIFIED_LOG}"
+}
+
 main() {
   local cmd="${1:-}"
   case "${cmd}" in
     set-url) shift; cmd_set_url "${1:-}" ;;
     refresh) cmd_refresh ;;
     status) cmd_status ;;
+    logs) cmd_logs ;;
     disable) cmd_disable ;;
     -h|--help|help|'') usage; [[ -n "${cmd}" ]] || exit 0 ;;
     *) echo "error: unknown command: ${cmd}" >&2; usage >&2; exit 1 ;;

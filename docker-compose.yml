@@ -1,15 +1,22 @@
-# Host network: binds 443 (stunnel) and 8139 (panel) on the host.
-# First boot token: docker compose exec rx cat /data/panel.token
-# From GHCR (after Actions push): image: ghcr.io/alex20251206-stack/rx-vpn:latest  (and remove build: .)
+# Ruoxue VPN — server (OpenVPN + stunnel + panel) on the host network.
+#
+# 1) Copy env:  cp .env.example .env  (or set variables below)
+# 2) Set OVPN_REMOTE_HOST to this machine's public IP or DNS name (clients connect here).
+# 3) Start:     docker compose pull && docker compose up -d
+# 4) Token:     docker compose exec rx cat /data/panel.token
+#
+# Local build instead of GHCR: comment out `image`, uncomment `build: .`
+
 services:
   rx:
-    build: .
+    image: ghcr.io/alex20251206-stack/rx-vpn:latest
+    # build: .
     network_mode: host
     privileged: true
     environment:
-      OVPN_REMOTE_HOST: 3.113.27.35
-      OVPN_REMOTE_PORT: "443"
-      STUNNEL_ACCEPT: "443"
+      OVPN_REMOTE_HOST: ${OVPN_REMOTE_HOST:?Set in .env — public IP or hostname for clients}
+      OVPN_REMOTE_PORT: ${OVPN_REMOTE_PORT:-443}
+      STUNNEL_ACCEPT: ${STUNNEL_ACCEPT:-443}
       LOG_DIR: /logs
     volumes:
       - ./data:/data
