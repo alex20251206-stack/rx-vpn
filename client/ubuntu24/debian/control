@@ -9,5 +9,5 @@ Rules-Requires-Root: no
 Package: rx-vpn-ubuntu
 Architecture: all
 Depends: openvpn (>= 2.5), stunnel4, curl, ca-certificates, ${misc:Depends}
-Description: Ruoxue — OpenVPN panel CLI (Ubuntu 24.04)
+Description: RX VPN — OpenVPN client CLI (Ubuntu 24.04)
  Subscription .ovpn + stunnel + systemd. Packaged under client/ubuntu24/. Data: /etc/rx-vpn/.

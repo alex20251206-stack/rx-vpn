@@ -1,4 +1,4 @@
-# Ruoxue VPN
+# RX VPN
 
 OpenVPN behind stunnel (TLS on port 443) with a small web panel to issue client profiles.
 
@@ -36,29 +36,24 @@ Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (s
 - URL: **`http://<server-ip>:8139/`** (or `https://` if you terminate TLS elsewhere).
 - Open the page, paste the **panel token** (same as `/data/panel.token`), then create or manage clients.
 - Subscription URL for a client (copy from the UI): uses **`OVPN_REMOTE_HOST`** from your server `.env` as the host (not the browser address bar), e.g.  
-  `http://<OVPN_REMOTE_HOST>:8139/api/subscription/<client-id>?token=<panel-token>`.  
+  `http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>?token=<panel-token>` (six-character `sub-code`, letters and digits).  
+  The older path `/api/subscription/<uuid>` still works.  
   If the panel is behind HTTPS or on a non-default port, set optional **`PANEL_PUBLIC_SCHEME`** and **`PANEL_PUBLIC_PORT`** in `.env` (see `.env.example`).
 
-## Client (Ubuntu 24.04)
+## RX VPN client (Ubuntu 24.04)
+
+The Linux **RX VPN client** is shipped as the Debian binary package **`rx-vpn-ubuntu`**, which installs the **`rx-vpn-ubuntu`** command (stunnel TLS to the server, OpenVPN to a local port, systemd units).
 
 ### Install from a release package
 
-Download `ovpn-panel-client_*_all.deb` from [Releases](https://github.com/alex20251206-stack/rx-vpn/releases), then:
+Download `rx-vpn-ubuntu_*_all.deb` from [Releases](https://github.com/alex20251206-stack/rx-vpn/releases), then:
 
 ```bash
-<<<<<<< HEAD
-sudo apt install ./ovpn-panel-client_*_all.deb
-sudo ovpn-panel-client set-url 'http://<OVPN_REMOTE_HOST>:8139/api/subscription/<client-id>?token=<panel-token>'
-```
-
-Use the exact URL copied from the panel (it matches **`OVPN_REMOTE_HOST`** and optional **`PANEL_PUBLIC_*`** from `.env`).
-=======
 sudo apt install ./rx-vpn-ubuntu_*_all.deb
-sudo rx-vpn-ubuntu set-url 'https://<server-ip>:8139/api/subscription/<client-id>?token=<panel-token>'
+sudo rx-vpn-ubuntu set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>?token=<panel-token>'
 ```
 
-Check status: `rx-vpn-ubuntu status`. Follow combined logs: `sudo rx-vpn-ubuntu logs`.
->>>>>>> 8a1776fa307b19d90999b680fd9e42539450d41f
+Use the exact URL copied from the panel (it matches **`OVPN_REMOTE_HOST`** and optional **`PANEL_PUBLIC_*`** from `.env`). Check status: `rx-vpn-ubuntu status`. Follow combined logs: `sudo rx-vpn-ubuntu logs`.
 
 ### Build and install from source
 
@@ -72,8 +67,8 @@ bash scripts/dev-install-client.sh
 ### Status and debugging
 
 ```bash
-ovpn-panel-client status
-sudo ovpn-panel-client logs
+rx-vpn-ubuntu status
+sudo rx-vpn-ubuntu logs
 ```
 
-`status` shows the current client state; `logs` tails the combined service logs (requires root).
+`rx-vpn-ubuntu status` shows the current client state; `rx-vpn-ubuntu logs` tails the combined service logs (requires root).

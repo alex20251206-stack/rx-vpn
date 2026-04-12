@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import uuid
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -72,6 +73,8 @@ def _validate_token(tok: str | None) -> str:
 
 state_store = ClientState()
 
+SUB_CODE_RE = re.compile(r"^[a-z0-9]{6}$")
+
 
 def fresh_cert_cn(client_id: str) -> str:
     return f"c_{client_id.replace('-', '')}_{uuid.uuid4().hex[:8]}"
@@ -84,7 +87,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Ruoxue VPN",
+    title="Ruoxue VPN Panel",
     version=_app_version(),
     lifespan=lifespan,
     docs_url=None,
@@ -102,6 +105,8 @@ class ClientPatch(BaseModel):
 
 class ClientOut(BaseModel):
     id: str
+    num: int
+    sub_code: str
     name: str
     cert_cn: str
     vpn_ip: str
@@ -121,6 +126,8 @@ def _enrich(rec: ClientRecord, status: dict[str, dict[str, object]] | None = Non
     up = int(st.get("upload_bytes", 0) or 0)
     return ClientOut(
         id=rec.id,
+        num=rec.num,
+        sub_code=rec.sub_code,
         name=rec.name,
         cert_cn=rec.cert_cn,
         vpn_ip=rec.vpn_ip,
@@ -129,7 +136,7 @@ def _enrich(rec: ClientRecord, status: dict[str, dict[str, object]] | None = Non
         upload_total=human_bytes(up),
         download_rate="—",
         upload_rate="—",
-        last_seen="在线" if rec.cert_cn in status else "—",
+        last_seen="Online" if rec.cert_cn in status else "—",
     )
 
 
@@ -142,6 +149,7 @@ def health() -> dict[str, str]:
 def list_clients(_: None = Depends(require_panel_token)) -> list[ClientOut]:
     clients, _ = state_store.read()
     status = parse_client_status()
+    clients = sorted(clients, key=lambda c: c.num)
     return [_enrich(c, status) for c in clients]
 
 
@@ -213,14 +221,7 @@ def delete_client(
     return {"status": "deleted"}
 
 
-@app.get("/api/subscription/{client_id}")
-def subscription(
-    client_id: str,
-    _tok: str = Depends(require_subscription_token),
-) -> PlainTextResponse:
-    rec = state_store.get(client_id)
-    if not rec:
-        raise HTTPException(404, detail="Client not found")
+def _subscription_response(rec: ClientRecord) -> PlainTextResponse:
     if not rec.enabled:
         raise HTTPException(403, detail="Client disabled")
     try:
@@ -228,6 +229,32 @@ def subscription(
     except OSError:
         raise HTTPException(500, detail="Cannot read certificate material")
     return PlainTextResponse(ovpn, media_type="text/plain; charset=utf-8")
+
+
+@app.get("/api/sub/{sub_code}")
+def subscription_by_code(
+    sub_code: str,
+    _tok: str = Depends(require_subscription_token),
+) -> PlainTextResponse:
+    code = sub_code.strip().lower()
+    if not SUB_CODE_RE.match(code):
+        raise HTTPException(404, detail="Invalid subscription code")
+    rec = state_store.get_by_sub_code(code)
+    if not rec:
+        raise HTTPException(404, detail="Client not found")
+    return _subscription_response(rec)
+
+
+@app.get("/api/subscription/{client_id}")
+def subscription(
+    client_id: str,
+    _tok: str = Depends(require_subscription_token),
+) -> PlainTextResponse:
+    """Legacy: full UUID client id in path. Prefer /api/sub/{6-char}."""
+    rec = state_store.get(client_id)
+    if not rec:
+        raise HTTPException(404, detail="Client not found")
+    return _subscription_response(rec)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -240,11 +267,11 @@ def dashboard() -> HTMLResponse:
 
 
 DASHBOARD_HTML = """<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Ruoxue VPN</title>
+  <title>Ruoxue VPN Panel</title>
   <style>
     :root {
       --bg: #121214;
@@ -279,6 +306,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       font-weight: 700;
       font-size: 1.15rem;
       letter-spacing: -0.02em;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     .brand svg { width: 28px; height: 28px; }
     .token-row {
@@ -410,35 +439,35 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
     <div class="token-row">
       <label for="tok">Panel token</label>
-      <input id="tok" type="password" autocomplete="off" placeholder="粘贴 panel.token"/>
-      <button type="button" class="btn" id="saveTok">保存到浏览器</button>
+      <input id="tok" type="password" autocomplete="off" placeholder="Paste value from /data/panel.token"/>
+      <button type="button" class="btn" id="saveTok">Save in browser</button>
     </div>
   </header>
   <main>
     <div class="section-head">
-      <h1>客户端</h1>
-      <button type="button" class="btn btn-primary" id="btnNew">+ 新建</button>
+      <h1>Clients</h1>
+      <button type="button" class="btn btn-primary" id="btnNew">+ New client</button>
     </div>
-    <p class="mono" id="hint">请求头 <code>X-Panel-Token</code> 与 <code>/data/panel.token</code> 一致。先在上方保存令牌。</p>
+    <p class="mono" id="hint">Header <code>X-Panel-Token</code> must match <code>/data/panel.token</code>. Save the token above first.</p>
     <div id="err" class="err" style="display:none"></div>
     <div class="list">
       <div class="row head">
-        <div>名称</div>
-        <div>地址</div>
-        <div>下行</div>
-        <div>上行</div>
-        <div style="text-align:right">操作</div>
+        <div>Client</div>
+        <div>Address</div>
+        <div>Download</div>
+        <div>Upload</div>
+        <div style="text-align:right">Actions</div>
       </div>
       <div id="rows"></div>
     </div>
   </main>
   <dialog id="dlg">
     <form method="dialog" id="formNew">
-      <p style="margin-top:0">新建客户端</p>
-      <input type="text" id="newName" placeholder="名称" required style="width:100%"/>
+      <p style="margin-top:0">New client</p>
+      <input type="text" id="newName" placeholder="Display name" required style="width:100%"/>
       <div style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:flex-end">
-        <button type="button" class="btn" id="dlgCancel">取消</button>
-        <button type="submit" class="btn btn-primary">创建</button>
+        <button type="button" class="btn" id="dlgCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
       </div>
     </form>
   </dialog>
@@ -473,12 +502,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     async function load() {
       showErr('');
       const t = localStorage.getItem(LS);
-      if (!t) { rowsEl.innerHTML = '<div class="row"><div class="mono">请先保存令牌</div></div>'; return; }
+      if (!t) { rowsEl.innerHTML = '<div class="row"><div class="mono">Save the token above first.</div></div>'; return; }
       const r = await fetch('/api/clients', { headers: hdr() });
       if (!r.ok) { showErr(await r.text()); rowsEl.innerHTML = ''; return; }
       const data = await r.json();
       if (!data.length) {
-        rowsEl.innerHTML = '<div class="row"><div class="mono" style="grid-column:1/-1">暂无客户端，点击「新建」</div></div>';
+        rowsEl.innerHTML = '<div class="row"><div class="mono" style="grid-column:1/-1">No clients yet. Click &quot;New client&quot;.</div></div>';
         return;
       }
       rowsEl.innerHTML = data.map(c => rowHtml(c)).join('');
@@ -487,14 +516,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     function rowHtml(c) {
       const sw = c.enabled ? '' : ' off';
       return `<div class="row" data-id="${c.id}">
-        <div><div class="name">${escapeHtml(c.name)}</div><div class="mono">${escapeHtml(c.last_seen)}</div></div>
+        <div><div class="name"><span class="mono">#${c.num}</span> ${escapeHtml(c.name)}</div><div class="mono">${escapeHtml(c.last_seen)}</div></div>
         <div class="mono">${escapeHtml(c.vpn_ip)}</div>
         <div class="traffic">${escapeHtml(c.download_total)}<br/><span class="mono">${escapeHtml(c.download_rate)}</span></div>
         <div class="traffic">${escapeHtml(c.upload_total)}<br/><span class="mono">${escapeHtml(c.upload_rate)}</span></div>
         <div class="actions">
-          <button type="button" class="switch${sw}" data-act="toggle" title="启用/禁用"><span class="knob"></span></button>
-          <button type="button" class="icon-btn" data-act="sub" title="复制订阅地址">🔗</button>
-          <button type="button" class="icon-btn danger" data-act="del" title="删除">🗑</button>
+          <button type="button" class="switch${sw}" data-act="toggle" title="Enable / disable"><span class="knob"></span></button>
+          <button type="button" class="icon-btn" data-act="sub" title="Copy subscription URL">🔗</button>
+          <button type="button" class="icon-btn danger" data-act="del" title="Delete">🗑</button>
         </div>
       </div>`;
     }
@@ -512,16 +541,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       };
       row.querySelector('[data-act=sub]').onclick = async () => {
         const t = localStorage.getItem(LS);
-        const u = SUBSCRIPTION_ORIGIN + '/api/subscription/' + c.id + '?token=' + encodeURIComponent(t);
+        const u = SUBSCRIPTION_ORIGIN + '/api/sub/' + c.sub_code + '?token=' + encodeURIComponent(t);
         try {
           await navigator.clipboard.writeText(u);
-          alert('已复制订阅地址（含 token，请妥善保管）');
+          alert('Subscription URL copied (contains secret token — keep it safe).');
         } catch(e) {
-          prompt('复制以下地址', u);
+          prompt('Copy this URL', u);
         }
       };
       row.querySelector('[data-act=del]').onclick = async () => {
-        if (!confirm('删除此客户端？')) return;
+        if (!confirm('Delete this client?')) return;
         const r = await fetch('/api/clients/'+c.id, { method:'DELETE', headers: hdr() });
         if (!r.ok) showErr(await r.text()); else load();
       };
