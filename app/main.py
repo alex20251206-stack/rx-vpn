@@ -83,7 +83,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Ruoxue VPN",
+    title="RuoxueX-vpn",
     version=_app_version(),
     lifespan=lifespan,
     docs_url=None,
@@ -239,7 +239,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Ruoxue · VPN</title>
+  <title>RuoxueX-vpn</title>
   <style>
     :root {
       --bg: #121214;
@@ -401,7 +401,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <path d="M12 8v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         <circle cx="12" cy="16" r="1.2" fill="currentColor"/>
       </svg>
-      Ruoxue
+      RuoxueX-vpn
     </div>
     <div class="token-row">
       <label for="tok">Panel token</label>
