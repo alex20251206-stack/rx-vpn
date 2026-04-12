@@ -1,7 +1,7 @@
-# Copied to /etc/default/ovpn-panel — override via `-e` or bind-mount.
-# Public endpoint for client configs (not baked into the image).
-OVPN_REMOTE_HOST=your.example.com
+# Baked into the image; overwritten at container start by scripts/docker-cmd.sh from
+# docker-compose environment (OVPN_REMOTE_HOST from .env, etc.).
+OVPN_REMOTE_HOST=127.0.0.1
 OVPN_REMOTE_PORT=443
-
-# Optional: stunnel public port (must match init-time STUNNEL_ACCEPT if you change it before first boot)
-# STUNNEL_ACCEPT=443
+STUNNEL_ACCEPT=443
+PANEL_PUBLIC_SCHEME=http
+PANEL_PUBLIC_PORT=8139

@@ -28,6 +28,18 @@ OVPN_REMOTE_HOST = os.environ.get("OVPN_REMOTE_HOST", "127.0.0.1")
 OVPN_REMOTE_PORT = os.environ.get("OVPN_REMOTE_PORT", "443")
 STUNNEL_ACCEPT = os.environ.get("STUNNEL_ACCEPT", OVPN_REMOTE_PORT)
 
+# Public panel URL for subscription links (matches docker-compose .env OVPN_REMOTE_HOST by default).
+PANEL_PUBLIC_SCHEME = os.environ.get("PANEL_PUBLIC_SCHEME", "http")
+PANEL_PUBLIC_PORT = os.environ.get("PANEL_PUBLIC_PORT", "8139")
+
+
+def subscription_public_origin() -> str:
+    """Base URL for subscription copy (host from OVPN_REMOTE_HOST; not browser origin)."""
+    host = OVPN_REMOTE_HOST.strip()
+    if ":" in host and not host.startswith("["):
+        host = f"[{host}]"
+    return f"{PANEL_PUBLIC_SCHEME}://{host}:{PANEL_PUBLIC_PORT}"
+
 # VPN subnet (topology subnet)
 VPN_NETWORK = os.environ.get("VPN_NETWORK", "10.8.0.0")
 VPN_NETMASK = os.environ.get("VPN_NETMASK", "255.255.255.0")

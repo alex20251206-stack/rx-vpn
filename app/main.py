@@ -1,6 +1,7 @@
 """OpenVPN control panel (port 8139)."""
 from __future__ import annotations
 
+import json
 import uuid
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -8,7 +9,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
-from app.config import PANEL_TOKEN_FILE
+from app.config import PANEL_TOKEN_FILE, subscription_public_origin
 from app.pki import (
     build_inline_ovpn,
     ensure_pki_and_server,
@@ -83,7 +84,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="RuoxueX-vpn",
+    title="Ruoxue VPN",
     version=_app_version(),
     lifespan=lifespan,
     docs_url=None,
@@ -230,8 +231,12 @@ def subscription(
 
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard() -> str:
-    return DASHBOARD_HTML
+def dashboard() -> HTMLResponse:
+    html = DASHBOARD_HTML.replace(
+        "__SUBSCRIPTION_ORIGIN_JSON__",
+        json.dumps(subscription_public_origin()),
+    )
+    return HTMLResponse(html)
 
 
 DASHBOARD_HTML = """<!DOCTYPE html>
@@ -239,7 +244,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>RuoxueX-vpn</title>
+  <title>Ruoxue VPN</title>
   <style>
     :root {
       --bg: #121214;
@@ -401,7 +406,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <path d="M12 8v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         <circle cx="12" cy="16" r="1.2" fill="currentColor"/>
       </svg>
-      RuoxueX-vpn
+      Ruoxue VPN
     </div>
     <div class="token-row">
       <label for="tok">Panel token</label>
@@ -438,6 +443,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </form>
   </dialog>
   <script>
+    const SUBSCRIPTION_ORIGIN = __SUBSCRIPTION_ORIGIN_JSON__;
     const LS = 'rx_ruoxue_token';
     const tokInput = document.getElementById('tok');
     const saveTok = document.getElementById('saveTok');
@@ -506,7 +512,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       };
       row.querySelector('[data-act=sub]').onclick = async () => {
         const t = localStorage.getItem(LS);
-        const u = location.origin + '/api/subscription/' + c.id + '?token=' + encodeURIComponent(t);
+        const u = SUBSCRIPTION_ORIGIN + '/api/subscription/' + c.id + '?token=' + encodeURIComponent(t);
         try {
           await navigator.clipboard.writeText(u);
           alert('已复制订阅地址（含 token，请妥善保管）');
