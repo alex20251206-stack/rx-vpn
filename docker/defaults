@@ -1,0 +1,7 @@
+# Copied to /etc/default/ovpn-panel — override via `-e` or bind-mount.
+# Public endpoint for client configs (not baked into the image).
+OVPN_REMOTE_HOST=your.example.com
+OVPN_REMOTE_PORT=443
+
+# Optional: stunnel public port (must match init-time STUNNEL_ACCEPT if you change it before first boot)
+# STUNNEL_ACCEPT=443

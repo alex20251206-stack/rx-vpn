@@ -1,0 +1,12 @@
+# Runtime data and logs (tokens, PKI, OpenVPN state)
+/data/
+/logs/
+
+.env
+**/__pycache__/
+**/*.pyc
+
+# dpkg-buildpackage -b from client/ (drops files in repo root)
+/ovpn-panel-client_*.deb
+/ovpn-panel-client_*.changes
+/ovpn-panel-client_*.buildinfo

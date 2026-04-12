@@ -1,0 +1,13 @@
+[Unit]
+Description=stunnel for OpenVPN
+After=ovpn-data-init.service network-online.target
+Wants=network-online.target
+ConditionPathExists=/data/stunnel/stunnel.conf
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/stunnel4 /data/stunnel/stunnel.conf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

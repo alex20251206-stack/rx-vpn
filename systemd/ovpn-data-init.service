@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize OpenVPN panel data directory
+Before=openvpn-ovpn.service stunnel-ovpn.service ovpn-panel.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/panel/scripts/ovpn-data-init.sh
+
+[Install]
+WantedBy=multi-user.target

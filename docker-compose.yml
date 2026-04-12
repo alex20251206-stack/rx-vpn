@@ -1,0 +1,20 @@
+# Host network: binds 443 (stunnel) and 8139 (panel) on the host.
+# First boot token: docker compose exec rx cat /data/panel.token
+services:
+  rx:
+    build: .
+    network_mode: host
+    privileged: true
+    environment:
+      OVPN_REMOTE_HOST: 3.113.27.35
+      OVPN_REMOTE_PORT: "443"
+      STUNNEL_ACCEPT: "443"
+      LOG_DIR: /logs
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    restart: unless-stopped
+    devices:
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN

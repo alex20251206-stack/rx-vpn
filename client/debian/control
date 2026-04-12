@@ -1,0 +1,13 @@
+Source: ovpn-panel-client
+Section: net
+Priority: optional
+Maintainer: Ruoxue <ruoxue@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: ovpn-panel-client
+Architecture: all
+Depends: openvpn (>= 2.5), stunnel4, curl, ca-certificates, ${misc:Depends}
+Description: Ruoxue — OpenVPN panel CLI for Ubuntu/Debian
+ Subscription .ovpn + stunnel + systemd (OpenVPN to localhost). Data: /etc/rx-vpn/.

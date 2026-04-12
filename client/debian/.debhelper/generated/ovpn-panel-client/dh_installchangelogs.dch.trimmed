@@ -1,0 +1,29 @@
+ovpn-panel-client (0.2.3-1) unstable; urgency=medium
+
+  * Maintainer Ruoxue; default profile/state under /etc/rx-vpn (was ovpn-panel).
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
+
+ovpn-panel-client (0.2.2-1) unstable; urgency=medium
+
+  * Remove stunnel connect override (no same-host self-connect path).
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
+
+ovpn-panel-client (0.2.1-1) unstable; urgency=medium
+
+  * OVPN_STUNNEL_CONNECT / stunnel.connect for same-host loopback.
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
+
+ovpn-panel-client (0.2.0-1) unstable; urgency=medium
+
+  * Client uses stunnel (TLS to server) plus OpenVPN to localhost.
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
+
+ovpn-panel-client (0.1.0-1) unstable; urgency=medium
+
+  * Initial packaging: set-url, refresh, status, disable.
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000

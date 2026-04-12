@@ -1,0 +1,1 @@
+"""OpenVPN panel application package."""
