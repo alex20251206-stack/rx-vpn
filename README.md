@@ -4,12 +4,14 @@ OpenVPN behind stunnel (TLS on port 443) with a small web panel to issue client 
 
 ## Server
 
-1. Clone this repo on the host (or copy `docker-compose.yml` and `.env.example`).
-2. Copy env and set your **public IP or DNS** (what clients use to reach this machine):
+1. Clone this repo on the host.
+
+2. Create your local Compose file and env (not committed — use the examples):
 
    ```bash
+   cp docker-compose.example.yml docker-compose.yml
    cp .env.example .env
-   # edit OVPN_REMOTE_HOST
+   # edit .env: set OVPN_REMOTE_HOST to this machine's public IP or DNS
    ```
 
 3. Start the stack (image from GitHub Container Registry):
@@ -25,7 +27,9 @@ OpenVPN behind stunnel (TLS on port 443) with a small web panel to issue client 
    docker compose exec rx cat /data/panel.token
    ```
 
-Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (see `docker-compose.yml`). Ports **443** (stunnel) and **8139** (panel) bind on the host.
+Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (see `docker-compose.example.yml`). Ports **443** (stunnel) and **8139** (panel) bind on the host.
+
+**Develop locally from source:** in `docker-compose.yml`, comment out `image`, uncomment `build: .`, then `docker compose up -d --build`.
 
 ## Control panel
 

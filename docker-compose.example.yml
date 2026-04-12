@@ -1,11 +1,12 @@
+# Copy to docker-compose.yml and adjust (docker-compose.yml is gitignored).
 # Ruoxue VPN — server (OpenVPN + stunnel + panel) on the host network.
 #
-# 1) Copy env:  cp .env.example .env  (or set variables below)
-# 2) Set OVPN_REMOTE_HOST to this machine's public IP or DNS name (clients connect here).
-# 3) Start:     docker compose pull && docker compose up -d
-# 4) Token:     docker compose exec rx cat /data/panel.token
+# 1) cp docker-compose.example.yml docker-compose.yml
+# 2) cp .env.example .env  and set OVPN_REMOTE_HOST
+# 3) docker compose pull && docker compose up -d
+# 4) docker compose exec rx cat /data/panel.token
 #
-# Local build instead of GHCR: comment out `image`, uncomment `build: .`
+# Local build: comment out `image`, uncomment `build: .`
 
 services:
   rx:
