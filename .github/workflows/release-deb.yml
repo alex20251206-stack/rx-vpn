@@ -1,6 +1,6 @@
 # Build client .deb and attach it to a GitHub Release for the pushed tag.
 # Usage: git tag v0.2.5 && git push origin v0.2.5
-# Then: Releases → the new release → download ovpn-panel-client_*_all.deb
+# Then: Releases → the new release → download rx-vpn-ubuntu_*_all.deb
 
 name: Release client deb
 
@@ -28,7 +28,7 @@ jobs:
       - name: Publish GitHub Release with .deb
         uses: softprops/action-gh-release@v2
         with:
-          files: client/ovpn-panel-client_*_all.deb
+          files: client/rx-vpn-ubuntu_*_all.deb
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

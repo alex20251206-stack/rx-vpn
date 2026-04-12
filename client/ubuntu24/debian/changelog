@@ -1,40 +1,52 @@
-ovpn-panel-client (0.2.5-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.7-1) unstable; urgency=medium
+
+  * Stunnel: set foreground=yes so systemd stunnel@.service keeps the tunnel running (fixes immediate exit / connection refused on localhost).
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 13 Apr 2026 12:00:00 +0000
+
+rx-vpn-ubuntu (0.2.6-1) unstable; urgency=medium
+
+  * Rename package and /usr/bin command from ovpn-panel-client to rx-vpn-ubuntu.
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 13 Apr 2026 12:00:00 +0000
+
+rx-vpn-ubuntu (0.2.5-1) unstable; urgency=medium
 
   * Single unified log for stunnel + OpenVPN (/var/log/rx-vpn/client.log); logs cmd.
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.2.4-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.4-1) unstable; urgency=medium
 
   * Packaging lives under client/ubuntu24/ (Ubuntu 24.04 target).
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.2.3-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.3-1) unstable; urgency=medium
 
   * Maintainer Ruoxue; default profile/state under /etc/rx-vpn (was ovpn-panel).
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.2.2-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.2-1) unstable; urgency=medium
 
   * Remove stunnel connect override (no same-host self-connect path).
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.2.1-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.1-1) unstable; urgency=medium
 
   * OVPN_STUNNEL_CONNECT / stunnel.connect for same-host loopback.
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.2.0-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.2.0-1) unstable; urgency=medium
 
   * Client uses stunnel (TLS to server) plus OpenVPN to localhost.
 
  -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
 
-ovpn-panel-client (0.1.0-1) unstable; urgency=medium
+rx-vpn-ubuntu (0.1.0-1) unstable; urgency=medium
 
   * Initial packaging: set-url, refresh, status, disable.
 

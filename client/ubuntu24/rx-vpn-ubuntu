@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenVPN + stunnel client for ovpn-panel:
+# OpenVPN + stunnel client for RuoxueX-vpn panel:
 # stunnel TLS -> server:443, OpenVPN -> 127.0.0.1:<local port>.
 
 set -euo pipefail
@@ -20,7 +20,7 @@ readonly UNIFIED_LOG="${OVPN_UNIFIED_LOG:-/var/log/rx-vpn/client.log}"
 
 usage() {
   cat <<'EOF'
-Usage: ovpn-panel-client <command>
+Usage: rx-vpn-ubuntu <command>
 
   set-url <url>   Save subscription URL, download .ovpn, configure stunnel
                   (TLS to server) + OpenVPN (to 127.0.0.1:<local port>),
@@ -154,8 +154,9 @@ _write_stunnel_conf() {
   install -d -m 0755 /etc/stunnel
   umask 022
   cat > "${STUNNEL_CONF}.tmp" <<EOF
-; Managed by ovpn-panel-client — do not edit by hand unless you know the layout.
-foreground = no
+; Managed by rx-vpn-ubuntu — do not edit by hand unless you know the layout.
+; foreground=yes: required for systemd stunnel@.service (Type=simple); foreground=no exits and the tunnel is torn down.
+foreground = yes
 debug = notice
 output = ${UNIFIED_LOG}
 
@@ -173,7 +174,7 @@ EOF
 _write_ovpn_dropin() {
   install -d -m 0755 "${OVPN_DROPIN_DIR}"
   cat > "${OVPN_DROPIN}.tmp" <<EOF
-# Managed by ovpn-panel-client
+# Managed by rx-vpn-ubuntu
 [Unit]
 After=network-online.target ${STUNNEL_UNIT}
 Requires=${STUNNEL_UNIT}
@@ -219,7 +220,7 @@ _fetch_and_install() {
 
 _need_url_file() {
   if [[ ! -f "${URL_FILE}" ]]; then
-    echo "error: no saved URL. Run: ovpn-panel-client set-url <url>" >&2
+    echo "error: no saved URL. Run: rx-vpn-ubuntu set-url <url>" >&2
     exit 1
   fi
 }
@@ -246,7 +247,7 @@ cmd_set_url() {
   systemctl restart "${OVPN_UNIT}"
   echo "Stunnel: ${STUNNEL_CONF} -> ${STUNNEL_UNIT}"
   echo "OpenVPN: ${CLIENT_CONF} -> ${OVPN_UNIT} (remote 127.0.0.1:$(_local_port))"
-  echo "Unified log: ${UNIFIED_LOG}  (ovpn-panel-client logs)"
+  echo "Unified log: ${UNIFIED_LOG}  (rx-vpn-ubuntu logs)"
 }
 
 cmd_refresh() {

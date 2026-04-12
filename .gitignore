@@ -7,13 +7,17 @@
 **/__pycache__/
 **/*.pyc
 
-# dpkg-buildpackage -b from client/ubuntu24/ (drops files in repo root)
-/ovpn-panel-client_*.deb
-/ovpn-panel-client_*.changes
-/ovpn-panel-client_*.buildinfo
+# dpkg-buildpackage -b from client/ubuntu24/ (writes to repo root and/or client/)
+# Covers ovpn-panel-client_*, rx-vpn-ubuntu_*, and any future package name.
+/*.deb
+/*.changes
+/*.buildinfo
+client/*.deb
+client/*.changes
+client/*.buildinfo
 
 # Local debian build under client/ubuntu24
-client/ubuntu24/debian/ovpn-panel-client/
+client/ubuntu24/debian/rx-vpn-ubuntu/
 client/ubuntu24/debian/.debhelper/
 client/ubuntu24/debian/files
 client/ubuntu24/debian/*.substvars
