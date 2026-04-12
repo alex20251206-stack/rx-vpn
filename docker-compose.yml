@@ -1,5 +1,6 @@
 # Host network: binds 443 (stunnel) and 8139 (panel) on the host.
 # First boot token: docker compose exec rx cat /data/panel.token
+# From GHCR (after Actions push): image: ghcr.io/alex20251206-stack/rx-vpn:latest  (and remove build: .)
 services:
   rx:
     build: .
