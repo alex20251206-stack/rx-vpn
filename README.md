@@ -33,6 +33,8 @@ Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (s
 
 **`VERSION` / panel tag:** the UI and API read the root `VERSION` file. To **auto-increase the patch number on each local commit**, run once per clone: `bash scripts/setup-git-hooks.sh` (sets `core.hooksPath` to `scripts/git-hooks`). If you never ran this, `VERSION` stays unchanged. Skip for one commit: `SKIP_VERSION_BUMP=1 git commit ...`.
 
+**Client `.deb` vs git tag:** CI runs `scripts/deb-set-changelog-from-tag.sh` before `dpkg-buildpackage`. Pushing tag **`v1.2.3`** produces **`rx-vpn-ubuntu_1.2.3-1_all.deb`** on the Release. The workflow **`rx-deb`** (tag pattern `rx-v*`) does the same when built from a tag.
+
 ## Control panel
 
 - URL: **`http://<server-ip>:8139/`** (or `https://` if you terminate TLS elsewhere).

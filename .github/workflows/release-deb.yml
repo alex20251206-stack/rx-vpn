@@ -1,5 +1,5 @@
 # Build client .deb and attach it to a GitHub Release for the pushed tag.
-# Usage: git tag v0.2.5 && git push origin v0.2.5
+# Usage: git tag v0.1.4 && git push origin v0.1.4  →  rx-vpn-ubuntu_0.1.4-1_all.deb
 # Then: Releases → the new release → download rx-vpn-ubuntu_*_all.deb
 
 name: Release client deb
@@ -20,6 +20,9 @@ jobs:
 
       - name: Install build dependencies
         run: sudo apt-get update -qq && sudo apt-get install -y -qq dpkg-dev debhelper
+
+      - name: Align debian/changelog with git tag
+        run: bash scripts/deb-set-changelog-from-tag.sh "${{ github.ref_name }}"
 
       - name: Build binary package
         working-directory: client/ubuntu24
