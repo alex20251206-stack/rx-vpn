@@ -1,0 +1,21 @@
+#!/bin/bash
+# Bump patch in VERSION on each commit (0.1.0 -> 0.1.1 -> ...).
+# Skip: SKIP_VERSION_BUMP=1 git commit ...
+set -euo pipefail
+if [[ -n "${SKIP_VERSION_BUMP:-}" ]]; then
+  exit 0
+fi
+ROOT="$(git rev-parse --show-toplevel)"
+VER_FILE="${ROOT}/VERSION"
+if [[ ! -f "${VER_FILE}" ]]; then
+  echo "0.1.0" > "${VER_FILE}"
+fi
+v="$(tr -d ' \t\r\n' < "${VER_FILE}")"
+if [[ ! "${v}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "pre-commit: VERSION must be semver MAJOR.MINOR.PATCH, got: ${v}" >&2
+  exit 1
+fi
+IFS=. read -r major minor patch <<< "${v}"
+patch=$((patch + 1))
+printf '%s.%s.%s\n' "${major}" "${minor}" "${patch}" > "${VER_FILE}"
+git add "${VER_FILE}"

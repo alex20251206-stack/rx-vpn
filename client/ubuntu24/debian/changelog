@@ -1,3 +1,9 @@
+ovpn-panel-client (0.2.4-1) unstable; urgency=medium
+
+  * Packaging lives under client/ubuntu24/ (Ubuntu 24.04 target).
+
+ -- Ruoxue <ruoxue@users.noreply.github.com>  Sun, 12 Apr 2026 12:00:00 +0000
+
 ovpn-panel-client (0.2.3-1) unstable; urgency=medium
 
   * Maintainer Ruoxue; default profile/state under /etc/rx-vpn (was ovpn-panel).

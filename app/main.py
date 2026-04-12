@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import uuid
+from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse, PlainTextResponse
@@ -20,6 +21,15 @@ from app.pki import (
     write_ccd,
 )
 from app.state import ClientRecord, ClientState
+
+
+def _app_version() -> str:
+    """Single source: repository root VERSION (also copied into the container)."""
+    root = Path(__file__).resolve().parent.parent
+    try:
+        return (root / "VERSION").read_text(encoding="utf-8").strip()
+    except OSError:
+        return "0.1.0"
 
 
 def _read_panel_token() -> str | None:
@@ -74,7 +84,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Ruoxue VPN",
-    version="0.2.1",
+    version=_app_version(),
     lifespan=lifespan,
     docs_url=None,
     redoc_url=None,
