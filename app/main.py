@@ -6,7 +6,7 @@ import re
 import uuid
 from pathlib import Path
 from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field
 
@@ -17,6 +17,8 @@ from app.pki import (
     human_bytes,
     issue_client_cert,
     parse_client_status,
+    ping_rtt_batch,
+    ping_rtt_ms,
     reload_openvpn_crl,
     remove_ccd,
     revoke_client_cert,
@@ -52,23 +54,6 @@ async def require_panel_token(x_panel_token: str | None = Header(None)) -> None:
             status_code=401,
             detail="Invalid or missing X-Panel-Token header",
         )
-
-
-def require_subscription_token(
-    token: str | None = Query(None, description="Same value as /data/panel.token"),
-    x_panel_token: str | None = Header(None),
-) -> str:
-    """Accept panel token via ?token= (for copy-paste URL) or X-Panel-Token."""
-    return _validate_token(token or x_panel_token)
-
-
-def _validate_token(tok: str | None) -> str:
-    expected = _read_panel_token()
-    if not expected:
-        raise HTTPException(503, detail="Panel token not initialized")
-    if not tok or tok != expected:
-        raise HTTPException(401, detail="Invalid or missing token")
-    return tok
 
 
 state_store = ClientState()
@@ -111,19 +96,36 @@ class ClientOut(BaseModel):
     cert_cn: str
     vpn_ip: str
     enabled: bool
+    connected: bool
+    latency_ms: float | None = None
     download_total: str
     upload_total: str
-    download_rate: str
-    upload_rate: str
     last_seen: str
 
 
-def _enrich(rec: ClientRecord, status: dict[str, dict[str, object]] | None = None) -> ClientOut:
+def _enrich(
+    rec: ClientRecord,
+    status: dict[str, dict[str, object]] | None = None,
+    lat_by_ip: dict[str, float | None] | None = None,
+) -> ClientOut:
     if status is None:
         status = parse_client_status()
-    st = status.get(rec.cert_cn, {})
-    down = int(st.get("download_bytes", 0) or 0)
-    up = int(st.get("upload_bytes", 0) or 0)
+    connected = rec.cert_cn in status
+    # Persistent totals (updated in list_clients via apply_traffic_from_status).
+    down = rec.traffic_acc_down
+    up = rec.traffic_acc_up
+    latency: float | None = None
+    if connected:
+        if lat_by_ip is not None:
+            latency = lat_by_ip.get(rec.vpn_ip)
+        else:
+            latency = ping_rtt_ms(rec.vpn_ip)
+    if not connected:
+        seen = "—"
+    elif latency is None:
+        seen = "—"
+    else:
+        seen = f"{latency:.1f} ms"
     return ClientOut(
         id=rec.id,
         num=rec.num,
@@ -132,11 +134,11 @@ def _enrich(rec: ClientRecord, status: dict[str, dict[str, object]] | None = Non
         cert_cn=rec.cert_cn,
         vpn_ip=rec.vpn_ip,
         enabled=rec.enabled,
+        connected=connected,
+        latency_ms=latency,
         download_total=human_bytes(down),
         upload_total=human_bytes(up),
-        download_rate="—",
-        upload_rate="—",
-        last_seen="Online" if rec.cert_cn in status else "—",
+        last_seen=seen,
     )
 
 
@@ -147,10 +149,14 @@ def health() -> dict[str, str]:
 
 @app.get("/api/clients", response_model=list[ClientOut])
 def list_clients(_: None = Depends(require_panel_token)) -> list[ClientOut]:
-    clients, _ = state_store.read()
     status = parse_client_status()
-    clients = sorted(clients, key=lambda c: c.num)
-    return [_enrich(c, status) for c in clients]
+    clients = sorted(
+        state_store.apply_traffic_from_status(status),
+        key=lambda c: c.num,
+    )
+    online_ips = [c.vpn_ip for c in clients if c.cert_cn in status]
+    lat_by_ip = ping_rtt_batch(online_ips) if online_ips else {}
+    return [_enrich(c, status, lat_by_ip) for c in clients]
 
 
 @app.post("/api/clients", response_model=ClientOut)
@@ -232,10 +238,7 @@ def _subscription_response(rec: ClientRecord) -> PlainTextResponse:
 
 
 @app.get("/api/sub/{sub_code}")
-def subscription_by_code(
-    sub_code: str,
-    _tok: str = Depends(require_subscription_token),
-) -> PlainTextResponse:
+def subscription_by_code(sub_code: str) -> PlainTextResponse:
     code = sub_code.strip().lower()
     if not SUB_CODE_RE.match(code):
         raise HTTPException(404, detail="Invalid subscription code")
@@ -246,10 +249,7 @@ def subscription_by_code(
 
 
 @app.get("/api/subscription/{client_id}")
-def subscription(
-    client_id: str,
-    _tok: str = Depends(require_subscription_token),
-) -> PlainTextResponse:
+def subscription(client_id: str) -> PlainTextResponse:
     """Legacy: full UUID client id in path. Prefer /api/sub/{6-char}."""
     rec = state_store.get(client_id)
     if not rec:
@@ -372,6 +372,18 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       letter-spacing: 0.04em;
     }
     .mono { font-family: ui-monospace, monospace; font-size: 0.82rem; color: var(--muted); }
+    .status-line {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.15rem;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
     .name { font-weight: 600; }
     .traffic { color: var(--muted); font-size: 0.8rem; }
     .actions { display: flex; gap: 0.35rem; flex-wrap: wrap; justify-content: flex-end; }
@@ -513,13 +525,24 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       rowsEl.innerHTML = data.map(c => rowHtml(c)).join('');
       data.forEach(bindRow);
     }
+    function statusDotStyle(c) {
+      if (!c.connected) return 'background:#71717a';
+      const ms = c.latency_ms;
+      if (ms == null || ms === '') return 'background:#22c55e';
+      const n = Number(ms);
+      if (Number.isNaN(n)) return 'background:#22c55e';
+      const x = Math.min(1, Math.max(0, n / 280));
+      const hue = Math.round(120 * (1 - x));
+      return 'background:hsl(' + hue + ' 70% 43%)';
+    }
     function rowHtml(c) {
       const sw = c.enabled ? '' : ' off';
+      const dot = statusDotStyle(c);
       return `<div class="row" data-id="${c.id}">
-        <div><div class="name"><span class="mono">#${c.num}</span> ${escapeHtml(c.name)}</div><div class="mono">${escapeHtml(c.last_seen)}</div></div>
+        <div><div class="name"><span class="mono">#${c.num}</span> ${escapeHtml(c.name)}</div><div class="status-line mono"><span class="status-dot" style="${dot}"></span>${escapeHtml(c.last_seen)}</div></div>
         <div class="mono">${escapeHtml(c.vpn_ip)}</div>
-        <div class="traffic">${escapeHtml(c.download_total)}<br/><span class="mono">${escapeHtml(c.download_rate)}</span></div>
-        <div class="traffic">${escapeHtml(c.upload_total)}<br/><span class="mono">${escapeHtml(c.upload_rate)}</span></div>
+        <div class="traffic">${escapeHtml(c.download_total)}</div>
+        <div class="traffic">${escapeHtml(c.upload_total)}</div>
         <div class="actions">
           <button type="button" class="switch${sw}" data-act="toggle" title="Enable / disable"><span class="knob"></span></button>
           <button type="button" class="icon-btn" data-act="sub" title="Copy subscription URL">🔗</button>
@@ -540,11 +563,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         if (!r.ok) showErr(await r.text()); else load();
       };
       row.querySelector('[data-act=sub]').onclick = async () => {
-        const t = localStorage.getItem(LS);
-        const u = SUBSCRIPTION_ORIGIN + '/api/sub/' + c.sub_code + '?token=' + encodeURIComponent(t);
+        const u = SUBSCRIPTION_ORIGIN + '/api/sub/' + c.sub_code;
         try {
           await navigator.clipboard.writeText(u);
-          alert('Subscription URL copied (contains secret token — keep it safe).');
+          alert('Subscription URL copied.');
         } catch(e) {
           prompt('Copy this URL', u);
         }
@@ -563,6 +585,15 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       dlg.close();
       if (!r.ok) showErr(await r.text()); else load();
     };
+
+    let pollBusy = false;
+    setInterval(() => {
+      if (!localStorage.getItem(LS)) return;
+      if (pollBusy) return;
+      pollBusy = true;
+      Promise.resolve(load()).finally(() => { pollBusy = false; });
+    }, 2000);
+
     load();
   </script>
 </body>

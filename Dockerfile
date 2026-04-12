@@ -7,6 +7,7 @@ ENV container=docker
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates openssl openvpn stunnel4 easy-rsa \
+    iputils-ping \
     python3 python3-pip \
     systemd systemd-sysv \
   && rm -rf /var/lib/apt/lists/*

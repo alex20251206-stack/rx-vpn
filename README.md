@@ -36,7 +36,7 @@ Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (s
 - URL: **`http://<server-ip>:8139/`** (or `https://` if you terminate TLS elsewhere).
 - Open the page, paste the **panel token** (same as `/data/panel.token`), then create or manage clients.
 - Subscription URL for a client (copy from the UI): uses **`OVPN_REMOTE_HOST`** from your server `.env` as the host (not the browser address bar), e.g.  
-  `http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>?token=<panel-token>` (six-character `sub-code`, letters and digits).  
+  `http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>` (six-character `sub-code`, letters and digits; no query string).  
   The older path `/api/subscription/<uuid>` still works.  
   If the panel is behind HTTPS or on a non-default port, set optional **`PANEL_PUBLIC_SCHEME`** and **`PANEL_PUBLIC_PORT`** in `.env` (see `.env.example`).
 
@@ -50,7 +50,7 @@ Download `rx-vpn-ubuntu_*_all.deb` from [Releases](https://github.com/alex202512
 
 ```bash
 sudo apt install ./rx-vpn-ubuntu_*_all.deb
-sudo rx-vpn-ubuntu set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>?token=<panel-token>'
+sudo rx-vpn-ubuntu set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
 ```
 
 Use the exact URL copied from the panel (it matches **`OVPN_REMOTE_HOST`** and optional **`PANEL_PUBLIC_*`** from `.env`). Check status: `rx-vpn-ubuntu status`. Follow combined logs: `sudo rx-vpn-ubuntu logs`.

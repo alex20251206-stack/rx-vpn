@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from app.config import (
@@ -24,6 +26,48 @@ from app.config import (
     VPN_NETMASK,
     VPN_NETWORK,
 )
+
+# ICMP RTT from iputils ping (Ubuntu), e.g. "time=1.23 ms" or "time<0.1 ms"
+_PING_MS = re.compile(r"time[<=]([\d.]+)\s*ms", re.IGNORECASE)
+
+
+def ping_rtt_ms(ip: str) -> float | None:
+    """Return ICMP round-trip time in milliseconds, or None if unreachable."""
+    try:
+        p = subprocess.run(
+            ["ping", "-c", "1", "-W", "2", ip],
+            capture_output=True,
+            text=True,
+            timeout=6,
+        )
+        out = (p.stdout or "") + (p.stderr or "")
+        m = _PING_MS.search(out)
+        if m:
+            return float(m.group(1))
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        pass
+    return None
+
+
+def ping_rtt_batch(ips: list[str]) -> dict[str, float | None]:
+    """Ping each IP in parallel (deduplicated order preserved for first occurrence)."""
+    if not ips:
+        return {}
+    uniq = list(dict.fromkeys(ips))
+    if len(uniq) == 1:
+        u = uniq[0]
+        return {u: ping_rtt_ms(u)}
+    out: dict[str, float | None] = {}
+    max_workers = min(16, len(uniq))
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        fut_to_ip = {pool.submit(ping_rtt_ms, ip): ip for ip in uniq}
+        for fut in as_completed(fut_to_ip):
+            ip = fut_to_ip[fut]
+            try:
+                out[ip] = fut.result()
+            except Exception:
+                out[ip] = None
+    return out
 
 
 def _env_base() -> dict[str, str]:

@@ -38,7 +38,7 @@ Environment:
 
 Data flow: OpenVPN -> 127.0.0.1:<local> -> stunnel -> TLS -> server:443 -> stunnel -> OpenVPN server.
 
-Subscription URL: .../api/sub/<sub_code>?token=<panel_token> (six letters/digits; legacy /api/subscription/<uuid> still works)
+Subscription URL: .../api/sub/<sub_code> (six letters/digits; legacy /api/subscription/<uuid> still works)
 EOF
 }
 

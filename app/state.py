@@ -29,6 +29,11 @@ class ClientRecord:
     enabled: bool = True
     num: int = 0
     sub_code: str = ""
+    # Cumulative traffic (OpenVPN status counters reset per session; we integrate deltas.)
+    traffic_acc_down: int = 0
+    traffic_acc_up: int = 0
+    traffic_snap_down: int = 0
+    traffic_snap_up: int = 0
 
     def to_json(self) -> dict[str, Any]:
         return asdict(self)
@@ -43,6 +48,10 @@ class ClientRecord:
             enabled=d.get("enabled", True),
             num=int(d["num"]) if d.get("num") is not None else 0,
             sub_code=str(d.get("sub_code") or ""),
+            traffic_acc_down=int(d.get("traffic_acc_down") or 0),
+            traffic_acc_up=int(d.get("traffic_acc_up") or 0),
+            traffic_snap_down=int(d.get("traffic_snap_down") or 0),
+            traffic_snap_up=int(d.get("traffic_snap_up") or 0),
         )
 
 
@@ -179,3 +188,36 @@ class ClientState:
             if c.sub_code == sub_code:
                 return c
         return None
+
+    def _accumulate_traffic(self, c: ClientRecord, status: dict[str, dict[str, object]]) -> bool:
+        """Merge OpenVPN session counters into persistent totals. Returns True if record changed."""
+        if c.cert_cn not in status:
+            if c.traffic_snap_down or c.traffic_snap_up:
+                c.traffic_snap_down = 0
+                c.traffic_snap_up = 0
+                return True
+            return False
+        st = status[c.cert_cn]
+        rd = int(st.get("download_bytes", 0) or 0)
+        ru = int(st.get("upload_bytes", 0) or 0)
+        dd = rd - c.traffic_snap_down if rd >= c.traffic_snap_down else rd
+        du = ru - c.traffic_snap_up if ru >= c.traffic_snap_up else ru
+        if dd:
+            c.traffic_acc_down += dd
+        if du:
+            c.traffic_acc_up += du
+        c.traffic_snap_down = rd
+        c.traffic_snap_up = ru
+        return bool(dd or du)
+
+    def apply_traffic_from_status(self, status: dict[str, dict[str, object]]) -> list[ClientRecord]:
+        """Update cumulative traffic from a parse_client_status() snapshot; persist if needed."""
+        with self.locked():
+            clients, next_seq = self._read_migrated_unlocked()
+            any_changed = False
+            for c in clients:
+                if self._accumulate_traffic(c, status):
+                    any_changed = True
+            if any_changed:
+                self.write(clients, next_seq)
+            return clients
