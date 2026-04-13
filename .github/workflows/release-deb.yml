@@ -4,7 +4,6 @@
 #   - rx-vpn-ubuntu_0.1.4-1_all.deb
 #   - rx-vpn-macos-0.1.4.tar.gz
 #   - rx-vpn-macos-0.1.4.sha256
-#   - rx-vpn-macos.rb (Homebrew formula with pinned SHA)
 
 name: Release client deb
 
@@ -32,7 +31,7 @@ jobs:
         working-directory: client/ubuntu24
         run: dpkg-buildpackage -us -uc -b
 
-      - name: Build macOS client tarball + formula
+      - name: Build macOS client tarball
         run: bash scripts/package-macos-client.sh "${{ github.ref_name }}"
 
       - name: Publish GitHub Release assets
@@ -42,7 +41,6 @@ jobs:
             client/rx-vpn-ubuntu_*_all.deb
             client/rx-vpn-macos-*.tar.gz
             client/rx-vpn-macos-*.sha256
-            client/rx-vpn-macos.rb
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

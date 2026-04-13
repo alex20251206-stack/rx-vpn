@@ -81,30 +81,23 @@ sudo rx-vpn-ubuntu logs
 
 The macOS client is a CLI command `rx-vpn-macos` (no GUI), using `launchd` system daemons (`/Library/LaunchDaemons`) to keep stunnel + OpenVPN running in the background.
 
-### Install with Homebrew from GitHub Release
+### Install on macOS (Homebrew deps + release tarball)
 
-After a tag release (`vX.Y.Z`) is pushed, CI uploads both `rx-vpn-macos-X.Y.Z.tar.gz` and `rx-vpn-macos.rb` to GitHub Releases.
+After a tag release (`vX.Y.Z`) is pushed, CI uploads `rx-vpn-macos-X.Y.Z.tar.gz` and `rx-vpn-macos-X.Y.Z.sha256` to GitHub Releases.
 
-Option A (recommended for most users): always install from the latest release.
-
-```bash
-curl -L -o /tmp/rx-vpn-macos.rb \
-  https://github.com/alex20251206-stack/rx-vpn/releases/latest/download/rx-vpn-macos.rb
-brew install --formula /tmp/rx-vpn-macos.rb
-sudo rx-vpn-macos set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
-```
-
-Option B (pinned version): replace `v0.1.2` with the version you want.
+Install dependencies with Homebrew, then install the client command from the release tarball:
 
 ```bash
-curl -L -o /tmp/rx-vpn-macos.rb \
-  https://github.com/alex20251206-stack/rx-vpn/releases/download/v0.1.2/rx-vpn-macos.rb
-brew install --formula /tmp/rx-vpn-macos.rb
+brew install openvpn stunnel
+curl -fL -o /tmp/rx-vpn-macos.tar.gz \
+  https://github.com/alex20251206-stack/rx-vpn/releases/download/v0.1.3/rx-vpn-macos-0.1.3.tar.gz
+tar -xzf /tmp/rx-vpn-macos.tar.gz -C /tmp
+sudo install -m 0755 /tmp/rx-vpn-macos /usr/local/bin/rx-vpn-macos
 sudo rx-vpn-macos set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
 ```
 
 Notes:
-- The formula declares `openvpn` and `stunnel` as dependencies, so Homebrew installs them automatically if missing.
+- Replace `v0.1.3` / `0.1.3` with the release version you want.
 - `set-url` bootstraps two system services: `com.rxvpn.stunnel` and `com.rxvpn.openvpn`.
 
 ### Commands (daily use)
