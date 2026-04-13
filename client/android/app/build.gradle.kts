@@ -134,12 +134,23 @@ android {
         {
             dimension = "ovpnimpl"
             buildConfigField("boolean", "openvpn3", "true")
+            // CMake must not infer ovpn3 from CMAKE_LIBRARY_OUTPUT_DIRECTORY (AGP uses cxx/<hash>/ paths).
+            externalNativeBuild {
+                cmake {
+                    arguments("-DRX_ENABLE_OVPN3_NATIVE=1")
+                }
+            }
         }
 
         create("ovpn2")
         {
             dimension = "ovpnimpl"
             buildConfigField("boolean", "openvpn3", "false")
+            externalNativeBuild {
+                cmake {
+                    arguments("-DRX_ENABLE_OVPN3_NATIVE=0")
+                }
+            }
         }
     }
 

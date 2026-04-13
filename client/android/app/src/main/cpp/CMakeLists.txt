@@ -43,11 +43,19 @@ endif()
 #-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/arne/software/icsopenvpn/main/build/intermediates/cmake/normal/debug/obj/arm64-v8a
 if (NOT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} MATCHES "build/intermediates/cmake/.*skeleton.*/")
     FIND_PACKAGE(SWIG 3.0 QUIET)
-    if(NOT SWIG_FOUND)
+    # RX_ENABLE_OVPN3_NATIVE is passed from Gradle per ovpnimpl flavor (see app/build.gradle.kts).
+    # Do not infer from CMAKE_LIBRARY_OUTPUT_DIRECTORY: newer AGP uses intermediates/cxx/<hash>/obj/...
+    if(RX_ENABLE_OVPN3_NATIVE AND SWIG_FOUND)
+        set(RX_BUILD_OVPN3_NATIVE TRUE)
+    else()
+        set(RX_BUILD_OVPN3_NATIVE FALSE)
+    endif()
+
+    if(NOT RX_BUILD_OVPN3_NATIVE AND NOT SWIG_FOUND)
         message(WARNING "SWIG not found, skipping OpenVPN3 native wrapper (ovpn3)")
     endif()
 
-    if(SWIG_FOUND)
+    if(RX_BUILD_OVPN3_NATIVE)
     add_custom_command(OUTPUT "ovpncli_wrap.cxx"
             COMMAND ${CMAKE_COMMAND} -E make_directory ovpn3
             COMMAND ${SWIG_EXECUTABLE} -outdir ovpn3

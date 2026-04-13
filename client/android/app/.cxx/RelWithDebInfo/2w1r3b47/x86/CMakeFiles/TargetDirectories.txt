@@ -1,0 +1,17 @@
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/lzo.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/lz4.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/crypto.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/ssl.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/ovpnutil.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/osslutil.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/osslspeedtest.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/openvpn.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/libovpnexec.so.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/pie_openvpn.x86.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/makeassetdir.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/edit_cache.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/CMakeFiles/rebuild_cache.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/fmt/CMakeFiles/fmt.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/fmt/CMakeFiles/fmt-c.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/fmt/CMakeFiles/edit_cache.dir
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/.cxx/RelWithDebInfo/2w1r3b47/x86/fmt/CMakeFiles/rebuild_cache.dir
