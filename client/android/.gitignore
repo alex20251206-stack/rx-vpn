@@ -1,3 +1,6 @@
 /.gradle/
 /local.properties
 /**/build/
+# External native / CMake (AGP); local only — do not commit
+**/.cxx/
+**/.externalNativeBuild/

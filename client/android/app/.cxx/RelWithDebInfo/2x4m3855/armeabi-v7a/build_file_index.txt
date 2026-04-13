@@ -1,9 +1,0 @@
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/CMakeLists.txt
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/GetGitRevisionDescription.cmake
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/GetGitRevisionDescription.cmake.in
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/fmt/CMakeLists.txt
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/fmt/support/cmake/JoinPaths.cmake
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/lz4.cmake
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/lzo.cmake
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/openssl.cmake
-/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/tools.cmake
