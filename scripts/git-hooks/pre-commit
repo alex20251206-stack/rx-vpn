@@ -17,5 +17,6 @@ if [[ ! "${v}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 IFS=. read -r major minor patch <<< "${v}"
 patch=$((patch + 1))
-printf '%s.%s.%s\n' "${major}" "${minor}" "${patch}" > "${VER_FILE}"
+new_ver="${major}.${minor}.${patch}"
+printf '%s\n' "${new_ver}" > "${VER_FILE}"
 git add "${VER_FILE}"

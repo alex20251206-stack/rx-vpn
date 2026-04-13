@@ -46,11 +46,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Use "basic" cache (GitHub Actions cache). Enhanced cache can fail restore with HTTP 400 on some runs.
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
 
       - name: Build Android release APK (ui + ovpn2, universal)
         working-directory: client/android
+        env:
+          GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false
         # No upload keystore in CI: use project property from ics-openvpn to sign release with debug key.
         run: ./gradlew :app:assembleUiOvpn2Release -PicsopenvpnDebugSign --no-daemon
 

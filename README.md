@@ -42,6 +42,8 @@ Requires: Docker with Compose, host networking, `privileged` + `/dev/net/tun` (s
 
 **`VERSION` / panel tag:** the UI and API read the root `VERSION` file. To **auto-increase the patch number on each local commit**, run once per clone: `bash scripts/setup-git-hooks.sh` (sets `core.hooksPath` to `scripts/git-hooks`). If you never ran this, `VERSION` stays unchanged. Skip for one commit: `SKIP_VERSION_BUMP=1 git commit ...`.
 
+**README version examples:** on each **`git push`**, the `pre-push` hook updates concrete `vX.Y.Z` / `rx-vpn-*-X.Y.Z` examples in this file to match the **latest local semver tag** `vMAJOR.MINOR.PATCH` (by version sort). If it changes `README.md`, it creates a commit and **aborts the push** — run `git push` again. Skip: `SKIP_README_SYNC=1 git push ...`. Manual: `bash scripts/sync-readme-version-from-latest-tag.sh`.
+
 **Client `.deb` vs git tag:** CI runs `scripts/deb-set-changelog-from-tag.sh` before `dpkg-buildpackage`. Pushing tag **`v1.2.3`** produces **`rx-vpn-ubuntu_1.2.3-1_all.deb`** on the Release. The workflow **`rx-deb`** (tag pattern `rx-v*`) does the same when built from a tag.
 
 ## Control panel
@@ -99,7 +101,7 @@ A minimal Android app is available under `client/android` (reference direction: 
 Open `client/android` with Android Studio to build and run.
 
 Tag release (`vX.Y.Z`) also builds and uploads an Android asset:
-- `rx-vpn-android-X.Y.Z-universal.apk` (universal APK, debug-signed in CI for sideload; re-sign for Play if needed)
+- `rx-vpn-android-0.1.7-universal.apk` (universal APK, debug-signed in CI for sideload; re-sign for Play if needed)
 
 ## RX VPN client (macOS, headless + system service)
 
@@ -117,7 +119,7 @@ sudo rx-vpn-macos set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
 Install a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash -s -- --version v0.1.3
+curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash -s -- --version v0.1.7
 ```
 
 Install and configure in one step:
@@ -158,15 +160,15 @@ rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
 ### Offline install (no external download during install)
 
 1) Download from Release:
-- `rx-vpn-windows-offline-X.Y.Z.zip`
-- `rx-vpn-windows-offline-X.Y.Z.sha256`
+- `rx-vpn-windows-offline-0.1.7.zip`
+- `rx-vpn-windows-offline-0.1.7.sha256`
 
 2) Verify SHA256 and run installer from extracted bundle (Administrator PowerShell):
 
 ```powershell
-certutil -hashfile .\rx-vpn-windows-offline-0.1.3.zip SHA256
-Expand-Archive .\rx-vpn-windows-offline-0.1.3.zip -DestinationPath .
-powershell -ExecutionPolicy Bypass -File .\rx-vpn-windows-offline-0.1.3\scripts\install-windows-client.ps1
+certutil -hashfile .\rx-vpn-windows-offline-0.1.7.zip SHA256
+Expand-Archive .\rx-vpn-windows-offline-0.1.7.zip -DestinationPath .
+powershell -ExecutionPolicy Bypass -File .\rx-vpn-windows-offline-0.1.7\scripts\install-windows-client.ps1
 rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
 ```
 
