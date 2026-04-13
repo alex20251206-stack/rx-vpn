@@ -150,6 +150,7 @@ def write_server_conf() -> None:
         "persist-tun",
         "keepalive 10 120",
         "topology subnet",
+        "client-to-client",
         f"server {VPN_NETWORK} {VPN_NETMASK}",
         f"ca {pki / 'ca.crt'}",
         f"cert {pki / 'issued' / 'server.crt'}",
