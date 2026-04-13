@@ -1,6 +1,10 @@
-# Build client .deb and attach it to a GitHub Release for the pushed tag.
-# Usage: git tag v0.1.4 && git push origin v0.1.4  →  rx-vpn-ubuntu_0.1.4-1_all.deb
-# Then: Releases → the new release → download rx-vpn-ubuntu_*_all.deb
+# Build client packages and attach them to a GitHub Release for the pushed tag.
+# Usage: git tag v0.1.4 && git push origin v0.1.4
+# Assets:
+#   - rx-vpn-ubuntu_0.1.4-1_all.deb
+#   - rx-vpn-macos-0.1.4.tar.gz
+#   - rx-vpn-macos-0.1.4.sha256
+#   - rx-vpn-macos.rb (Homebrew formula with pinned SHA)
 
 name: Release client deb
 
@@ -28,10 +32,17 @@ jobs:
         working-directory: client/ubuntu24
         run: dpkg-buildpackage -us -uc -b
 
-      - name: Publish GitHub Release with .deb
+      - name: Build macOS client tarball + formula
+        run: bash scripts/package-macos-client.sh "${{ github.ref_name }}"
+
+      - name: Publish GitHub Release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: client/rx-vpn-ubuntu_*_all.deb
+          files: |
+            client/rx-vpn-ubuntu_*_all.deb
+            client/rx-vpn-macos-*.tar.gz
+            client/rx-vpn-macos-*.sha256
+            client/rx-vpn-macos.rb
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

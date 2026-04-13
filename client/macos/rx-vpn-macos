@@ -1,0 +1,300 @@
+#!/usr/bin/env bash
+# OpenVPN + stunnel client for RX VPN panel on macOS.
+# Data flow: OpenVPN -> 127.0.0.1:<local> -> stunnel -> TLS -> server:443.
+
+set -euo pipefail
+
+readonly STATE_DIR="/usr/local/etc/rx-vpn"
+readonly URL_FILE="${STATE_DIR}/subscription.url"
+readonly LOCAL_PORT_FILE="${STATE_DIR}/local.port"
+readonly CA_FILE="${STATE_DIR}/stunnel-ca.pem"
+readonly OVPN_CONF="${STATE_DIR}/client.ovpn"
+readonly STUNNEL_CONF="${STATE_DIR}/stunnel.conf"
+readonly UNIFIED_LOG="${STATE_DIR}/client.log"
+readonly STUNNEL_PLIST="/Library/LaunchDaemons/com.rxvpn.stunnel.plist"
+readonly OPENVPN_PLIST="/Library/LaunchDaemons/com.rxvpn.openvpn.plist"
+
+usage() {
+  cat <<'EOF'
+Usage: rx-vpn-macos <command>
+
+  set-url <url>   Save subscription URL, refresh config, install and start launchd services.
+  refresh         Re-download profile and restart services.
+  status          Show config and launchd status.
+  logs            Follow unified log file.
+  disable         Stop and disable launchd services.
+
+Environment:
+  OVPN_LOCAL_PORT    Local TCP port for OpenVPN (default: 11941).
+EOF
+}
+
+require_root() {
+  if [[ "${EUID:-}" -ne 0 ]]; then
+    echo "error: run as root (sudo)" >&2
+    exit 1
+  fi
+}
+
+_bin_path() {
+  local name="$1"
+  local p
+  p="$(command -v "${name}" || true)"
+  if [[ -z "${p}" ]]; then
+    echo "error: required command not found: ${name}" >&2
+    echo "hint: install with Homebrew first." >&2
+    exit 1
+  fi
+  echo "${p}"
+}
+
+_local_port() {
+  if [[ -n "${OVPN_LOCAL_PORT:-}" ]]; then
+    echo "${OVPN_LOCAL_PORT}"
+    return
+  fi
+  if [[ -f "${LOCAL_PORT_FILE}" ]]; then
+    tr -d '[:space:]' < "${LOCAL_PORT_FILE}"
+    return
+  fi
+  echo "11941"
+}
+
+_parse_remote() {
+  local f="$1"
+  local rest
+  rest="$(awk '/^[[:space:]]*remote[[:space:]]/{sub(/^[[:space:]]*remote[[:space:]]+/,""); print; exit}' "${f}")" || true
+  if [[ -z "${rest}" ]]; then
+    echo "error: no 'remote' line in profile" >&2
+    exit 1
+  fi
+  # shellcheck disable=SC2086
+  set -- ${rest}
+  REMOTE_HOST="${1:-}"
+  REMOTE_PORT="${2:-}"
+  if [[ -z "${REMOTE_HOST}" || -z "${REMOTE_PORT}" ]]; then
+    echo "error: invalid remote line: ${rest}" >&2
+    exit 1
+  fi
+}
+
+_extract_ca_from_ovpn() {
+  local src="$1" dst="$2"
+  awk '
+    /<ca>/ { p=1; next }
+    p && /<\/ca>/ { exit }
+    p { print }
+  ' "${src}" > "${dst}.tmp"
+  mv -f "${dst}.tmp" "${dst}"
+  chmod 0644 "${dst}"
+  if [[ ! -s "${dst}" ]]; then
+    echo "error: empty <ca> block in profile" >&2
+    exit 1
+  fi
+}
+
+_rewrite_ovpn_local_remote() {
+  local src="$1" lp="$2" dst="$3"
+  awk -v lp="${lp}" '
+    /^[[:space:]]*remote[[:space:]]/ {
+      if (!done) {
+        print "remote 127.0.0.1 " lp
+        done = 1
+      }
+      next
+    }
+    { print }
+  ' "${src}" > "${dst}.tmp"
+  mv -f "${dst}.tmp" "${dst}"
+  chmod 0644 "${dst}"
+}
+
+_inject_ovpn_log() {
+  local conf="$1" logf="$2"
+  awk -v lf="${logf}" '
+    /^[[:space:]]*log[[:space:]]/ { next }
+    /^[[:space:]]*log-append[[:space:]]/ { next }
+    { print }
+  ' "${conf}" > "${conf}.strip"
+  mv -f "${conf}.strip" "${conf}"
+  printf "\nlog-append %s\n" "${logf}" >> "${conf}"
+}
+
+_write_stunnel_conf() {
+  local host="$1" port="$2" lp="$3"
+  cat > "${STUNNEL_CONF}.tmp" <<EOF
+foreground = yes
+debug = notice
+output = ${UNIFIED_LOG}
+
+[openvpn]
+client = yes
+accept = 127.0.0.1:${lp}
+connect = ${host}:${port}
+verifyChain = yes
+CAfile = ${CA_FILE}
+EOF
+  mv -f "${STUNNEL_CONF}.tmp" "${STUNNEL_CONF}"
+  chmod 0644 "${STUNNEL_CONF}"
+}
+
+_write_plists() {
+  local stunnel_bin openvpn_bin
+  stunnel_bin="$(_bin_path stunnel)"
+  openvpn_bin="$(_bin_path openvpn)"
+
+  cat > "${STUNNEL_PLIST}.tmp" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.rxvpn.stunnel</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${stunnel_bin}</string>
+    <string>${STUNNEL_CONF}</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>${UNIFIED_LOG}</string>
+  <key>StandardErrorPath</key><string>${UNIFIED_LOG}</string>
+</dict>
+</plist>
+EOF
+
+  cat > "${OPENVPN_PLIST}.tmp" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.rxvpn.openvpn</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>${openvpn_bin}</string>
+    <string>--config</string>
+    <string>${OVPN_CONF}</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>${UNIFIED_LOG}</string>
+  <key>StandardErrorPath</key><string>${UNIFIED_LOG}</string>
+</dict>
+</plist>
+EOF
+
+  mv -f "${STUNNEL_PLIST}.tmp" "${STUNNEL_PLIST}"
+  mv -f "${OPENVPN_PLIST}.tmp" "${OPENVPN_PLIST}"
+  chmod 0644 "${STUNNEL_PLIST}" "${OPENVPN_PLIST}"
+}
+
+_launchd_reload() {
+  launchctl bootout system/com.rxvpn.openvpn >/dev/null 2>&1 || true
+  launchctl bootout system/com.rxvpn.stunnel >/dev/null 2>&1 || true
+  launchctl bootstrap system "${STUNNEL_PLIST}"
+  launchctl bootstrap system "${OPENVPN_PLIST}"
+  launchctl enable system/com.rxvpn.stunnel
+  launchctl enable system/com.rxvpn.openvpn
+  launchctl kickstart -k system/com.rxvpn.stunnel
+  launchctl kickstart -k system/com.rxvpn.openvpn
+}
+
+_fetch_and_install() {
+  local tmp lp
+  tmp="$(mktemp)"
+  if ! curl -fsSL --connect-timeout 15 --max-time 120 -H "Accept: text/plain" "$(cat "${URL_FILE}")" > "${tmp}"; then
+    echo "error: failed to fetch subscription URL" >&2
+    rm -f "${tmp}"
+    exit 1
+  fi
+  if ! grep -q '<ca>' "${tmp}"; then
+    echo "error: response is not an inline OpenVPN profile" >&2
+    rm -f "${tmp}"
+    exit 1
+  fi
+
+  lp="$(_local_port)"
+  printf '%s\n' "${lp}" > "${LOCAL_PORT_FILE}"
+  chmod 0644 "${LOCAL_PORT_FILE}"
+
+  REMOTE_HOST=""
+  REMOTE_PORT=""
+  _parse_remote "${tmp}"
+  _extract_ca_from_ovpn "${tmp}" "${CA_FILE}"
+  _write_stunnel_conf "${REMOTE_HOST}" "${REMOTE_PORT}" "${lp}"
+  _rewrite_ovpn_local_remote "${tmp}" "${lp}" "${OVPN_CONF}"
+  _inject_ovpn_log "${OVPN_CONF}" "${UNIFIED_LOG}"
+  rm -f "${tmp}"
+}
+
+cmd_set_url() {
+  require_root
+  local url="${1:-}"
+  if [[ -z "${url}" ]]; then
+    echo "error: missing URL" >&2
+    exit 1
+  fi
+  install -d -m 0755 "${STATE_DIR}"
+  : > "${UNIFIED_LOG}"
+  chmod 0644 "${UNIFIED_LOG}"
+  umask 077
+  printf '%s\n' "${url}" > "${URL_FILE}"
+  chmod 0600 "${URL_FILE}"
+  _fetch_and_install
+  _write_plists
+  _launchd_reload
+  echo "Configured and started: com.rxvpn.stunnel + com.rxvpn.openvpn"
+}
+
+cmd_refresh() {
+  require_root
+  if [[ ! -f "${URL_FILE}" ]]; then
+    echo "error: no saved URL. Run: rx-vpn-macos set-url <url>" >&2
+    exit 1
+  fi
+  _fetch_and_install
+  _write_plists
+  _launchd_reload
+  echo "Refreshed profile and restarted services."
+}
+
+cmd_status() {
+  echo "State dir: ${STATE_DIR}"
+  echo "Local port: $(_local_port)"
+  [[ -f "${URL_FILE}" ]] && echo "URL: configured" || echo "URL: not configured"
+  echo "--- launchctl print system/com.rxvpn.stunnel ---"
+  launchctl print system/com.rxvpn.stunnel 2>/dev/null || true
+  echo "--- launchctl print system/com.rxvpn.openvpn ---"
+  launchctl print system/com.rxvpn.openvpn 2>/dev/null || true
+}
+
+cmd_logs() {
+  if [[ ! -f "${UNIFIED_LOG}" ]]; then
+    echo "error: no log yet (${UNIFIED_LOG})" >&2
+    exit 1
+  fi
+  tail -f "${UNIFIED_LOG}"
+}
+
+cmd_disable() {
+  require_root
+  launchctl bootout system/com.rxvpn.openvpn >/dev/null 2>&1 || true
+  launchctl bootout system/com.rxvpn.stunnel >/dev/null 2>&1 || true
+  launchctl disable system/com.rxvpn.openvpn >/dev/null 2>&1 || true
+  launchctl disable system/com.rxvpn.stunnel >/dev/null 2>&1 || true
+  echo "Stopped and disabled services."
+}
+
+main() {
+  local cmd="${1:-}"
+  case "${cmd}" in
+    set-url) shift; cmd_set_url "${1:-}" ;;
+    refresh) cmd_refresh ;;
+    status) cmd_status ;;
+    logs) cmd_logs ;;
+    disable) cmd_disable ;;
+    -h|--help|help|'') usage ;;
+    *) echo "error: unknown command: ${cmd}" >&2; usage >&2; exit 1 ;;
+  esac
+}
+
+main "$@"
