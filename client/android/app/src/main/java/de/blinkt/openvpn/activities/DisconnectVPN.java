@@ -18,7 +18,7 @@ import android.os.RemoteException;
 import android.widget.Toast;
 
 import de.blinkt.openvpn.LaunchVPN;
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.core.GlobalPreferences;
 import de.blinkt.openvpn.core.IOpenVPNServiceInternal;
 import de.blinkt.openvpn.core.OpenVPNService;

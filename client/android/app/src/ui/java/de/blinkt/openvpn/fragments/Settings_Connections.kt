@@ -14,7 +14,7 @@ import de.blinkt.openvpn.fragments.Settings_Fragment
 import de.blinkt.openvpn.fragments.ConnectionsAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 
 class Settings_Connections : Settings_Fragment(), View.OnClickListener {
     private lateinit var mConnectionsAdapter: ConnectionsAdapter

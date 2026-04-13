@@ -39,7 +39,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.ListFragment
 import de.blinkt.openvpn.LaunchVPN
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.activities.BaseActivity
 import de.blinkt.openvpn.activities.ConfigConverter

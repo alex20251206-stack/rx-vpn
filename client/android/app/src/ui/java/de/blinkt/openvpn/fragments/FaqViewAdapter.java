@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class FaqViewAdapter extends RecyclerView.Adapter<FaqViewAdapter.FaqViewHolder> {
     private final FaqFragment.FAQEntry[] mFaqItems;

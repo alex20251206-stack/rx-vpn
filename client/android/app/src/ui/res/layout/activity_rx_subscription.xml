@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="RX VPN"
+        android:text="@string/app"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -17,21 +17,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="就绪" />
+        android:text="@string/rx_status_ready" />
 
     <TextView
         android:id="@+id/rxSpeed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="下行: 0 KB/s 上行: 0 KB/s" />
+        android:text="@string/rx_speed_initial" />
 
     <EditText
         android:id="@+id/rxInputUrl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="订阅 URL"
+        android:hint="@string/rx_hint_subscription_url"
         android:singleLine="true" />
 
     <LinearLayout
@@ -45,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="保存" />
+            android:text="@string/rx_save" />
 
         <Button
             android:id="@+id/rxDeleteSub"
@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="删除" />
+            android:text="@string/rx_delete" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,22 +67,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="连接选中订阅" />
+            android:text="@string/rx_connect" />
 
         <Button
-            android:id="@+id/rxOpenAdvanced"
+            android:id="@+id/rxOpenLog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="高级页" />
+            android:text="@string/rx_log" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="订阅列表" />
+        android:text="@string/rx_subscription_list" />
 
     <ListView
         android:id="@+id/rxSubList"

@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import androidx.preference.PreferenceDialogFragmentCompat;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.VpnProfile;
 
 import static de.blinkt.openvpn.VpnProfile.X509_VERIFY_TLSREMOTE_COMPAT_NOREMAPPING;

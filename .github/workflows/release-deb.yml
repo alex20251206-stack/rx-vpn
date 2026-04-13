@@ -6,7 +6,7 @@
 #   - rx-vpn-macos-0.1.4.sha256
 #   - rx-vpn-windows-offline-0.1.4.zip
 #   - rx-vpn-windows-offline-0.1.4.sha256
-#   - rx-vpn-android-0.1.4-unsigned.apk
+#   - rx-vpn-android-0.1.4-universal.apk (debug-signed universal APK from CI; sideload / own signing)
 
 name: Release client deb
 
@@ -49,15 +49,16 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Android release APK (unsigned)
+      - name: Build Android release APK (ui + ovpn2, universal)
         working-directory: client/android
-        run: gradle :app:assembleRelease
+        # No upload keystore in CI: use project property from ics-openvpn to sign release with debug key.
+        run: ./gradlew :app:assembleUiOvpn2Release -PicsopenvpnDebugSign --no-daemon
 
       - name: Copy Android APK to release assets dir
         run: |
           VER="${GITHUB_REF_NAME#v}"
-          cp client/android/app/build/outputs/apk/release/app-release-unsigned.apk \
-            "client/rx-vpn-android-${VER}-unsigned.apk"
+          cp client/android/app/build/outputs/apk/uiOvpn2/release/app-ui-ovpn2-universal-release.apk \
+            "client/rx-vpn-android-${VER}-universal.apk"
 
       - name: Publish GitHub Release assets
         uses: softprops/action-gh-release@v2
@@ -68,7 +69,7 @@ jobs:
             client/rx-vpn-macos-*.sha256
             client/rx-vpn-windows-offline-*.zip
             client/rx-vpn-windows-offline-*.sha256
-            client/rx-vpn-android-*-unsigned.apk
+            client/rx-vpn-android-*-universal.apk
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

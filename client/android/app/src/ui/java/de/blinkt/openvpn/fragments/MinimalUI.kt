@@ -36,7 +36,7 @@ import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import de.blinkt.openvpn.LaunchVPN
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.VpnProfile.TYPE_KEYSTORE
 import de.blinkt.openvpn.VpnProfile.TYPE_USERPASS_KEYSTORE

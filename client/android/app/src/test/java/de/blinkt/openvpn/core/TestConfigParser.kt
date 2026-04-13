@@ -8,7 +8,7 @@ package de.blinkt.openvpn.core
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

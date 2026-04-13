@@ -24,7 +24,8 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.BuildConfig;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.core.VpnStatus;
 
 public class SendDumpFragment extends Fragment {
@@ -112,8 +113,9 @@ public class SendDumpFragment extends Fragment {
             return;
         }
 
-        uris.add(Uri.parse("content://de.blinkt.openvpn.FileProvider/" + ldump.first.getName()));
-        uris.add(Uri.parse("content://de.blinkt.openvpn.FileProvider/" + ldump.first.getName() + ".log"));
+        String authority = BuildConfig.APPLICATION_ID + ".FileProvider";
+        uris.add(Uri.parse("content://" + authority + "/" + ldump.first.getName()));
+        uris.add(Uri.parse("content://" + authority + "/" + ldump.first.getName() + ".log"));
 
         emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);

@@ -21,7 +21,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class VpnStatus {
     private static final LinkedList<LogItem> logbuffer;

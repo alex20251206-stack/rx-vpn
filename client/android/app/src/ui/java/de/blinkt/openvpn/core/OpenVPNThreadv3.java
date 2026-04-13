@@ -5,7 +5,7 @@
 package de.blinkt.openvpn.core;
 
 import de.blinkt.openvpn.VpnProfile;
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class OpenVPNThreadv3 implements Runnable, OpenVPNManagement {
     private final OpenVPNService mService;

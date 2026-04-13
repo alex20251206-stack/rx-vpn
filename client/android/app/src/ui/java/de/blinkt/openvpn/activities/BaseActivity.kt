@@ -19,7 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.core.GlobalPreferences
 import de.blinkt.openvpn.core.LocaleHelper
 

@@ -35,7 +35,7 @@ import java.util.MissingFormatArgumentException;
 import java.util.UnknownFormatConversionException;
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 /**
  * Created by arne on 24.04.16.

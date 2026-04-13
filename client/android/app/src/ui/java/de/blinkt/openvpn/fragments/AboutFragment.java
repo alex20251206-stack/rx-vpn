@@ -34,7 +34,7 @@ import androidx.fragment.app.Fragment;
 
 import com.android.vending.billing.IInAppBillingService;
 
-import de.blinkt.openvpn.BuildConfig;
+import com.ruoxue.vpn.BuildConfig;
 import de.blinkt.openvpn.core.NativeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +47,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.core.VpnStatus;
 import kotlin.text.Charsets;
 

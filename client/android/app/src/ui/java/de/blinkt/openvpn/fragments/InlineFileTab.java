@@ -17,7 +17,7 @@ import android.widget.EditText;
 import androidx.fragment.app.Fragment;
 
 import de.blinkt.openvpn.activities.FileSelect;
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class InlineFileTab extends Fragment
 {

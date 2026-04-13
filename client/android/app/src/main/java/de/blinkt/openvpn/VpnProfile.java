@@ -22,6 +22,9 @@ import android.security.KeyChainException;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ruoxue.vpn.BuildConfig;
+import com.ruoxue.vpn.R;
+
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Pair;

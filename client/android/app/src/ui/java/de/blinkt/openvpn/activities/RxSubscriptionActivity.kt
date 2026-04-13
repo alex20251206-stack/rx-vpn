@@ -13,7 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import de.blinkt.openvpn.LaunchVPN
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ConfigParser
 import de.blinkt.openvpn.core.OpenVPNService
@@ -38,6 +38,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTitle(R.string.app)
         setContentView(R.layout.activity_rx_subscription)
 
         statusText = findViewById(R.id.rxStatus)
@@ -59,7 +60,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
             }
             val idx = subs.indexOf(url)
             if (idx >= 0) listView.setItemChecked(idx, true)
-            statusText.text = "已保存订阅"
+            statusText.text = getString(R.string.rx_saved)
         }
 
         findViewById<Button>(R.id.rxDeleteSub).setOnClickListener {
@@ -68,22 +69,22 @@ class RxSubscriptionActivity : AppCompatActivity() {
                 subs.removeAt(pos)
                 saveSubs()
                 adapter.notifyDataSetChanged()
-                statusText.text = "已删除订阅"
+                statusText.text = getString(R.string.rx_deleted)
             }
         }
 
         findViewById<Button>(R.id.rxConnect).setOnClickListener {
             val pos = listView.checkedItemPosition
             if (pos !in subs.indices) {
-                Toast.makeText(this, "请先选择订阅", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.rx_select_subscription, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val url = subs[pos]
             fetchAndConnect(url)
         }
 
-        findViewById<Button>(R.id.rxOpenAdvanced).setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+        findViewById<Button>(R.id.rxOpenLog).setOnClickListener {
+            startActivity(Intent(this, LogWindow::class.java))
         }
 
         loadSubs()
@@ -99,7 +100,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
                 val curTx = TrafficStats.getTotalTxBytes()
                 val down = (curRx - lastRx).coerceAtLeast(0L)
                 val up = (curTx - lastTx).coerceAtLeast(0L)
-                speedText.text = "下行: ${fmtSpeed(down)}  上行: ${fmtSpeed(up)}"
+                speedText.text = getString(R.string.rx_speed_fmt, fmtSpeed(down), fmtSpeed(up))
                 lastRx = curRx
                 lastTx = curTx
                 ui.postDelayed(this, 1000)
@@ -129,7 +130,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
     }
 
     private fun fetchAndConnect(subscriptionUrl: String) {
-        statusText.text = "正在下载订阅..."
+        statusText.text = getString(R.string.rx_downloading)
         thread {
             try {
                 val conn = (URL(subscriptionUrl).openConnection() as HttpURLConnection).apply {
@@ -139,7 +140,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
                     setRequestProperty("Accept", "text/plain")
                 }
                 val content = conn.inputStream.bufferedReader().use { it.readText() }
-                if (!content.contains("<ca>")) error("订阅内容不是有效 ovpn")
+                if (!content.contains("<ca>")) error(getString(R.string.rx_invalid_ovpn))
                 val parsed = parseProfileForTunnel(content)
                 RxTlsTunnel.restart(
                     remoteHost = parsed.remoteHost,
@@ -165,11 +166,13 @@ class RxSubscriptionActivity : AppCompatActivity() {
                     action = Intent.ACTION_MAIN
                 }
                 runOnUiThread {
-                    statusText.text = "隧道已就绪并准备连接: ${profile.mName}"
+                    statusText.text = getString(R.string.rx_tunnel_ready, profile.mName)
                     startActivity(start)
                 }
             } catch (e: Exception) {
-                runOnUiThread { statusText.text = "连接失败: ${e.message ?: "unknown"}" }
+                runOnUiThread {
+                    statusText.text = getString(R.string.rx_connect_failed, e.message ?: "unknown")
+                }
             }
         }
     }
@@ -183,14 +186,14 @@ class RxSubscriptionActivity : AppCompatActivity() {
 
     private fun parseProfileForTunnel(profile: String): ParsedProfile {
         val remoteLine = profile.lineSequence().firstOrNull { it.trim().startsWith("remote ") }
-            ?: error("未找到 remote 行")
+            ?: error(getString(R.string.rx_err_no_remote))
         val remoteParts = remoteLine.trim().split(Regex("\\s+"))
-        if (remoteParts.size < 3) error("remote 行格式无效")
+        if (remoteParts.size < 3) error(getString(R.string.rx_err_remote_format))
         val host = remoteParts[1]
-        val port = remoteParts[2].toIntOrNull() ?: error("remote 端口无效")
+        val port = remoteParts[2].toIntOrNull() ?: error(getString(R.string.rx_err_remote_port))
 
         val caMatch = Pattern.compile("(?s)<ca>\\s*(.*?)\\s*</ca>").matcher(profile)
-        if (!caMatch.find()) error("未找到 <ca> 块")
+        if (!caMatch.find()) error(getString(R.string.rx_err_no_ca))
         val ca = caMatch.group(1)
         return ParsedProfile(
             remoteHost = host,
@@ -217,7 +220,7 @@ class RxSubscriptionActivity : AppCompatActivity() {
                 }
             }
             .toMutableList()
-        if (!replaced) error("未能重写 remote")
+        if (!replaced) error(getString(R.string.rx_err_rewrite_remote))
         return out.joinToString("\n")
     }
 }

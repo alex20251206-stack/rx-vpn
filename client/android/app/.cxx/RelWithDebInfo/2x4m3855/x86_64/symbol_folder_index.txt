@@ -1,0 +1,1 @@
+/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/build/intermediates/cxx/RelWithDebInfo/2x4m3855/obj/x86_64

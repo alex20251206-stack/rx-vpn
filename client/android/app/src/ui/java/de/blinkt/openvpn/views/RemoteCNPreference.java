@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.DialogPreference;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class RemoteCNPreference extends DialogPreference {
 

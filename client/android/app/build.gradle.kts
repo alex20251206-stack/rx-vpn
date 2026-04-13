@@ -16,12 +16,28 @@ if (file("/opt/homebrew/bin/swig").exists())
 else if (file("/usr/local/bin/swig").exists())
     swigcmd = "/usr/local/bin/swig"
 
+// Same source as scripts/git-hooks/pre-commit (repo root VERSION).
+fun readRxVpnSemverFromVersionFile(): Pair<String, Int> {
+    val f = rootProject.projectDir.resolve("../../VERSION")
+    val raw = if (f.exists()) f.readText().trim() else "0.0.0"
+    val parts = raw.split(".").map { it.toIntOrNull() ?: 0 }
+    val major = parts.getOrElse(0) { 0 }.coerceIn(0, 99)
+    val minor = parts.getOrElse(1) { 0 }.coerceIn(0, 999)
+    val patch = parts.getOrElse(2) { 0 }.coerceIn(0, 999)
+    val versionName = "$major.$minor.$patch"
+    val versionCode = major * 1_000_000 + minor * 1_000 + patch
+    return versionName to versionCode
+}
+
+val (rxVpnVersionName, rxVpnVersionCode) = readRxVpnSemverFromVersionFile()
+
 android {
     buildFeatures {
         aidl = true
         buildConfig = true
     }
-    namespace = "de.blinkt.openvpn"
+    // Match applicationId so IDE/adb use the same package; Java/Kotlin code stays under de.blinkt.openvpn.*
+    namespace = "com.ruoxue.vpn"
     compileSdk = 36
     //compileSdkPreview = "UpsideDownCake"
 
@@ -29,11 +45,12 @@ android {
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
+        applicationId = "com.ruoxue.vpn"
         minSdk = 21
         targetSdk = 36
         //targetSdkPreview = "UpsideDownCake"
-        versionCode = 219
-        versionName = "0.7.64"
+        versionCode = rxVpnVersionCode
+        versionName = rxVpnVersionName
         externalNativeBuild {
             cmake {
                 if (swigcmd != null) {
@@ -122,7 +139,6 @@ android {
         create("ovpn2")
         {
             dimension = "ovpnimpl"
-            versionNameSuffix = "-o2"
             buildConfigField("boolean", "openvpn3", "false")
         }
     }

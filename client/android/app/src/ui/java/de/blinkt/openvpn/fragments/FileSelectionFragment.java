@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.activities.FileSelect;
 
 public class FileSelectionFragment extends ListFragment {

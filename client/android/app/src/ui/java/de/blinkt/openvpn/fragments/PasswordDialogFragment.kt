@@ -16,7 +16,7 @@ import android.os.RemoteException
 import android.text.InputType
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.core.OpenVPNService.EXTRA_CHALLENGE_TXT
 
 class PasswordDialogFragment : DialogFragment() {

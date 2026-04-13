@@ -4,7 +4,7 @@
   ~ Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
   -->
 <resources>
-    <string name="app">ඇන්ඩ්‍රොයිඩ් සඳහා ඕපන්වීපීඑන්</string>
+    <string name="app">Ruoxue VPN</string>
     <string name="address">සේවාදායකයේ ලිපිනය:</string>
     <string name="port">සේවාදායකයේ කෙවෙනිය:</string>
     <string name="location">ස්ථානය</string>

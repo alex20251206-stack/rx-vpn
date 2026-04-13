@@ -18,7 +18,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class NetworkUtils {
 

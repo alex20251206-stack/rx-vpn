@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 
 import android.system.Os;
 import android.util.Log;
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.VpnProfile;
 
 import java.io.FileDescriptor;

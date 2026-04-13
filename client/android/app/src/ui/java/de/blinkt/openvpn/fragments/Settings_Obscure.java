@@ -16,7 +16,7 @@ import androidx.preference.Preference;
 
 import java.util.Locale;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.VpnProfile;
 
 public class Settings_Obscure extends OpenVpnPreferencesFragment implements Preference.OnPreferenceChangeListener {

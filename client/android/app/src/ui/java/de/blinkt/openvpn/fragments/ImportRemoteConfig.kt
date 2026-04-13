@@ -23,7 +23,7 @@ import android.widget.*
 import androidx.core.view.isInvisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.activities.ConfigConverter
 import de.blinkt.openvpn.core.Preferences
 import kotlinx.coroutines.Dispatchers

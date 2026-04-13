@@ -23,7 +23,7 @@ import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.api.ExternalCertificateProvider
 import de.blinkt.openvpn.core.ExtAuthHelper

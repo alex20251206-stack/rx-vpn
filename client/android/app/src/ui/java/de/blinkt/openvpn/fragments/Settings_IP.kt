@@ -7,7 +7,7 @@ package de.blinkt.openvpn.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.preference.*
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.fragments.OpenVpnPreferencesFragment
 import de.blinkt.openvpn.VpnProfile
 

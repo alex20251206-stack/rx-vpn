@@ -15,7 +15,7 @@ import android.net.NetworkInfo.State;
 import android.os.Handler;
 import android.os.Looper;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 import de.blinkt.openvpn.core.VpnStatus.ByteCountListener;
 
 import java.util.LinkedList;

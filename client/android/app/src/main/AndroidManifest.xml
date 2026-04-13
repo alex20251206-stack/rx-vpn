@@ -17,7 +17,7 @@
 
 
     <application
-        android:name=".core.ICSOpenVPNApplication"
+        android:name="de.blinkt.openvpn.core.ICSOpenVPNApplication"
         android:allowBackup="true"
         android:appCategory="productivity"
         android:icon="@mipmap/ic_launcher"
@@ -31,7 +31,7 @@
             android:resource="@xml/app_restrictions" />
 
         <activity
-            android:name=".activities.DisconnectVPN"
+            android:name="de.blinkt.openvpn.activities.DisconnectVPN"
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
             android:noHistory="true"
@@ -40,7 +40,7 @@
 
 
         <service
-            android:name=".core.OpenVPNService"
+            android:name="de.blinkt.openvpn.core.OpenVPNService"
             android:exported="true"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:foregroundServiceType="specialUse"
@@ -52,7 +52,7 @@
 
         </service>
         <service
-            android:name=".api.ExternalOpenVPNService"
+            android:name="de.blinkt.openvpn.api.ExternalOpenVPNService"
             android:process=":openvpn"
             android:exported="true"
                 tools:ignore="ExportedService">
@@ -61,24 +61,24 @@
             </intent-filter>
         </service>
         <service
-            android:name=".core.OpenVPNStatusService"
+            android:name="de.blinkt.openvpn.core.OpenVPNStatusService"
             android:exported="false"
             android:process=":openvpn" />
 
-        <activity android:name=".api.GrantPermissionsActivity"
+        <activity android:name="de.blinkt.openvpn.api.GrantPermissionsActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".api.ConfirmDialog"
+        <activity android:name="de.blinkt.openvpn.api.ConfirmDialog"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".OnBootReceiver"
+        <receiver android:name="de.blinkt.openvpn.OnBootReceiver"
                 android:exported="true">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -86,14 +86,14 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".core.keepVPNAlive"
+        <service android:name="de.blinkt.openvpn.core.keepVPNAlive"
                 android:process=":openvpn"
                 android:exported="true"
                 android:permission="android.permission.BIND_JOB_SERVICE"/>
 
 
         <activity
-            android:name=".LaunchVPN"
+            android:name="de.blinkt.openvpn.LaunchVPN"
             android:autoRemoveFromRecents="true"
             android:excludeFromRecents="true"
             android:label="@string/vpn_launch_title"
@@ -114,7 +114,7 @@
             </intent-filter>
         </receiver>
         -->
-        <activity android:name=".api.RemoteAction"
+        <activity android:name="de.blinkt.openvpn.api.RemoteAction"
                 android:launchMode="singleInstance"
                 android:autoRemoveFromRecents="true"
                 android:excludeFromRecents="true"
@@ -124,25 +124,25 @@
                 />
 
         <activity-alias
-            android:name=".api.ConnectVPN"
+            android:name="de.blinkt.openvpn.api.ConnectVPN"
             android:exported="true"
-            android:targetActivity=".api.RemoteAction" />
+            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
         <activity-alias
-            android:name=".api.DisconnectVPN"
+            android:name="de.blinkt.openvpn.api.DisconnectVPN"
             android:exported="true"
-            android:targetActivity=".api.RemoteAction" />
+            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
         <activity-alias
-                android:name=".api.PauseVPN"
+                android:name="de.blinkt.openvpn.api.PauseVPN"
                 android:exported="true"
-                android:targetActivity=".api.RemoteAction" />
+                android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
         <activity-alias
-                android:name=".api.ResumeVPN"
+                android:name="de.blinkt.openvpn.api.ResumeVPN"
                 android:exported="true"
-                android:targetActivity=".api.RemoteAction" />
+                android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
         <activity-alias
-                android:name=".api.SetDefaultVPN"
+                android:name="de.blinkt.openvpn.api.SetDefaultVPN"
                 android:exported="true"
-                android:targetActivity=".api.RemoteAction" />
+                android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
 
     </application>
 

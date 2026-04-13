@@ -1,0 +1,214 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/build/intermediates/cxx/Debug/2z5i5o2r/obj/x86_64/libosslutil.so"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"add_link_options",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 123,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 12,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 124,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC"
+				},
+				{
+					"fragment" : "-std=gnu++2b"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "osslutil_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/crypto/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/crypto/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/crypto"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/crypto/ec/curve448/arch_32"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/crypto/ec/curve448"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/providers/common/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/providers/implementations/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Volumes/OWC-SSD/TribVpn/rx-vpn/client/android/app/src/main/cpp/openssl/providers/fips/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "23"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			],
+			"sysroot" : 
+			{
+				"path" : "/Users/alex/Library/Android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+			}
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "crypto::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "ssl::@6890427a1f51a3e7e1df"
+		}
+	],
+	"id" : "osslutil::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-Xlinker",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "--build-id=none",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "-llog",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "libcrypto.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "libssl.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "libcrypto.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-latomic -lm",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX",
+		"sysroot" : 
+		{
+			"path" : "/Users/alex/Library/Android/sdk/ndk/29.0.14206865/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+		}
+	},
+	"name" : "osslutil",
+	"nameOnDisk" : "libosslutil.so",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "ovpnutil/osslutil.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

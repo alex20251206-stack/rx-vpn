@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 
 import java.util.Vector;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 public class FaqFragment extends Fragment {
     static class FAQEntry {

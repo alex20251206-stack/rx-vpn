@@ -4,9 +4,10 @@
  */
 package de.blinkt.openvpn.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
-import de.blinkt.openvpn.R
+import androidx.activity.OnBackPressedCallback
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.fragments.LogFragment
 
 /**
@@ -18,6 +19,15 @@ class LogWindow : BaseActivity() {
         setContentView(R.layout.log_window)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    navigateToSubscriptionHome()
+                }
+            }
+        )
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, LogFragment())
@@ -27,7 +37,17 @@ class LogWindow : BaseActivity() {
         setUpEdgeEdgeInsetsListener(getWindow().getDecorView().getRootView(), R.id.container)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
+    private fun navigateToSubscriptionHome() {
+        startActivity(
+            Intent(this, RxSubscriptionActivity::class.java).addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            )
+        )
+        finish()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        navigateToSubscriptionHome()
+        return true
     }
 }

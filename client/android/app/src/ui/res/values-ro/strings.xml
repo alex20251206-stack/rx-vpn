@@ -4,7 +4,7 @@
   ~ Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
   -->
 <resources>
-    <string name="app">OpenVPN pentru Android</string>
+    <string name="app">Ruoxue VPN</string>
     <string name="address">Adresa server:</string>
     <string name="port">Port server:</string>
     <string name="location">Locaţie</string>

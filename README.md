@@ -99,7 +99,7 @@ A minimal Android app is available under `client/android` (reference direction: 
 Open `client/android` with Android Studio to build and run.
 
 Tag release (`vX.Y.Z`) also builds and uploads an Android asset:
-- `rx-vpn-android-X.Y.Z-unsigned.apk`
+- `rx-vpn-android-X.Y.Z-universal.apk` (universal APK, debug-signed in CI for sideload; re-sign for Play if needed)
 
 ## RX VPN client (macOS, headless + system service)
 

@@ -21,7 +21,7 @@
             android:usesCleartextTraffic="true">
         <activity
                 android:exported="true"
-                android:name=".activities.MainActivity"
+                android:name="de.blinkt.openvpn.activities.MainActivity"
                 tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
@@ -36,34 +36,34 @@
         </activity>
         <activity
                 android:exported="true"
-                android:name=".activities.RxSubscriptionActivity"
+                android:name="de.blinkt.openvpn.activities.RxSubscriptionActivity"
                 tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.InternalWebView" />
+        <activity android:name="de.blinkt.openvpn.activities.InternalWebView" />
         <activity
-                android:name=".activities.CredentialsPopup"
+                android:name="de.blinkt.openvpn.activities.CredentialsPopup"
                 android:theme="@style/blinkt.dialog" />
 
 
         <activity
-                android:name=".activities.LogWindow"
+                android:name="de.blinkt.openvpn.activities.LogWindow"
                 android:allowTaskReparenting="true"
                 android:label="@string/openvpn_log"
                 android:launchMode="singleTask" />
 
         <activity
-                android:name=".activities.VPNPreferences"
+                android:name="de.blinkt.openvpn.activities.VPNPreferences"
                 android:exported="false"
                 android:windowSoftInputMode="stateHidden" />
 
-        <activity android:name=".activities.FileSelect" />
+        <activity android:name="de.blinkt.openvpn.activities.FileSelect" />
         <service
                 android:exported="true"
-                android:name=".OpenVPNTileService"
+                android:name="de.blinkt.openvpn.OpenVPNTileService"
                 android:icon="@drawable/ic_quick"
                 android:label="@string/qs_title"
                 android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
@@ -77,7 +77,7 @@
                     android:value="false" />
         </service>
         <activity
-                android:name=".activities.ConfigConverter"
+                android:name="de.blinkt.openvpn.activities.ConfigConverter"
                 android:exported="true"
                 android:excludeFromRecents="true"
                 android:label="Convert Config File"
@@ -124,9 +124,9 @@
         </activity> <!-- https://commonsware.com/blog/2019/03/27/death-external-storage-stay-away-files.html -->
         <activity-alias
                 android:exported="true"
-                android:name=".activities.ConfigConverterFile"
+                android:name="de.blinkt.openvpn.activities.ConfigConverterFile"
                 android:enabled="@bool/supportFileScheme"
-                android:targetActivity=".activities.ConfigConverter">
+                android:targetActivity="de.blinkt.openvpn.activities.ConfigConverter">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -146,7 +146,7 @@
 
         <activity
                 android:exported="true"
-                android:name=".activities.CreateShortcuts"
+                android:name="de.blinkt.openvpn.activities.CreateShortcuts"
                 android:excludeFromRecents="true"
                 android:label="@string/vpn_shortcut"
                 android:taskAffinity=".CreateShortcuts"
@@ -160,9 +160,9 @@
 
         <activity
                 android:exported="false"
-                android:name=".activities.OpenSSLSpeed"
+                android:name="de.blinkt.openvpn.activities.OpenSSLSpeed"
                 android:label="@string/title_activity_open_sslspeed"
-                android:parentActivityName=".activities.MainActivity">
+                android:parentActivityName="de.blinkt.openvpn.activities.MainActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="de.blinkt.openvpn.activities.MainActivity" />
@@ -170,7 +170,7 @@
 
 
         <provider
-                android:name=".FileProvider"
+                android:name="de.blinkt.openvpn.FileProvider"
                 android:authorities="${applicationId}.FileProvider"
                 android:exported="true"
                 android:grantUriPermissions="true"

@@ -3,7 +3,7 @@
   ~ Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
   -->
 <resources>
-    <string name="app">OpenVPN for Android</string>
+    <string name="app">Ruoxue VPN</string>
     <string name="address">Server Address:</string>
     <string name="port">Server Port:</string>
     <string name="location">Location</string>
@@ -505,5 +505,28 @@
     <string name="cannot_start_vpn_not_configured">Cannot start VPN. No default VPN has been configured.</string>
     <string name="minimal_ui_not_available">Functionality not available when minimal UI is enabled</string>
     <string name="missing_keychain_access">Access to Android keychain certificate is missing. Tap this notification to select/import a certificate</string>
+
+    <!-- Subscription home (RxSubscriptionActivity) -->
+    <string name="rx_status_ready">Ready</string>
+    <string name="rx_speed_initial">Down: 0 KB/s  Up: 0 KB/s</string>
+    <string name="rx_hint_subscription_url">Subscription URL</string>
+    <string name="rx_save">Save</string>
+    <string name="rx_delete">Delete</string>
+    <string name="rx_connect">Connect</string>
+    <string name="rx_log">Log</string>
+    <string name="rx_subscription_list">Subscriptions</string>
+    <string name="rx_saved">Subscription saved</string>
+    <string name="rx_deleted">Subscription deleted</string>
+    <string name="rx_select_subscription">Select a subscription first</string>
+    <string name="rx_speed_fmt">Down: %1$s  Up: %2$s</string>
+    <string name="rx_downloading">Downloading subscription…</string>
+    <string name="rx_invalid_ovpn">Subscription is not valid OpenVPN (missing &lt;ca&gt;)</string>
+    <string name="rx_tunnel_ready">Tunnel ready, connecting: %1$s</string>
+    <string name="rx_connect_failed">Connection failed: %1$s</string>
+    <string name="rx_err_no_remote">No remote line in profile</string>
+    <string name="rx_err_remote_format">Invalid remote line format</string>
+    <string name="rx_err_remote_port">Invalid remote port</string>
+    <string name="rx_err_no_ca">No &lt;ca&gt; block in profile</string>
+    <string name="rx_err_rewrite_remote">Could not rewrite remote line</string>
 
 </resources>

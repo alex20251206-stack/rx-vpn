@@ -20,7 +20,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.Preferences
 import java.io.ByteArrayOutputStream

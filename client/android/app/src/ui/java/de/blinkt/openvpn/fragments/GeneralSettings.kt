@@ -17,8 +17,8 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.*
-import de.blinkt.openvpn.BuildConfig
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.BuildConfig
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.activities.OpenSSLSpeed
 import de.blinkt.openvpn.api.ConfirmDialog.ANONYMOUS_PACKAGE
 import de.blinkt.openvpn.api.ExternalAppDatabase

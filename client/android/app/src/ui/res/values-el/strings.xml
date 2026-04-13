@@ -4,7 +4,7 @@
   ~ Distributed under the GNU GPL v2 with additional terms. For full terms see the file doc/LICENSE.txt
   -->
 <resources>
-    <string name="app">OpenVPN για Android</string>
+    <string name="app">Ruoxue VPN</string>
     <string name="address">Διεύθυνση διακομιστή:</string>
     <string name="port">Θύρα διακομιστή:</string>
     <string name="location">Τοποθεσία</string>

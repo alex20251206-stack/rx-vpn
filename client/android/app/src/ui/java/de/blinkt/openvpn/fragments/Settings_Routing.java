@@ -12,7 +12,7 @@ import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 
-import de.blinkt.openvpn.R;
+import com.ruoxue.vpn.R;
 
 
 public class Settings_Routing extends OpenVpnPreferencesFragment implements Preference.OnPreferenceChangeListener {

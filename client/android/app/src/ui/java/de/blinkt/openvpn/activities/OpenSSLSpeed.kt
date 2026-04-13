@@ -16,7 +16,7 @@ import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import de.blinkt.openvpn.R
+import com.ruoxue.vpn.R
 import de.blinkt.openvpn.core.NativeUtils
 import de.blinkt.openvpn.core.OpenVPNService
 import kotlinx.coroutines.Dispatchers
