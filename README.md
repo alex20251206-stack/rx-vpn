@@ -2,6 +2,15 @@
 
 OpenVPN behind stunnel (TLS on port 443) with a small web panel to issue client profiles.
 
+## Quick Navigation
+
+- [Server](#server)
+- [Control panel](#control-panel)
+- [RX VPN client (Ubuntu 24.04)](#rx-vpn-client-ubuntu-2404)
+- [RX VPN client (Android minimal)](#rx-vpn-client-android-minimal)
+- [RX VPN client (macOS, headless + system service)](#rx-vpn-client-macos-headless--system-service)
+- [RX VPN client (Windows, headless + system service)](#rx-vpn-client-windows-headless--system-service)
+
 ## Server
 
 1. Clone this repo on the host.
@@ -76,6 +85,21 @@ sudo rx-vpn-ubuntu logs
 ```
 
 `rx-vpn-ubuntu status` shows the current client state; `rx-vpn-ubuntu logs` tails the combined service logs (requires root).
+
+## RX VPN client (Android minimal)
+
+A minimal Android app is available under `client/android` (reference direction: `ics-openvpn`):
+- maintain subscription URLs
+- display realtime link speed
+- built-in `VpnService` start/stop skeleton (no external app dependency)
+- embedded native dependency path for `openvpn` and `stunnel` (`app/src/main/jniLibs/arm64-v8a/`)
+- arm64 binaries are bundled in-repo (source package checksums in `third_party/android/`)
+- Android code is flattened into `client/android/app` as a standalone module (no vendor/project mapping)
+
+Open `client/android` with Android Studio to build and run.
+
+Tag release (`vX.Y.Z`) also builds and uploads an Android asset:
+- `rx-vpn-android-X.Y.Z-unsigned.apk`
 
 ## RX VPN client (macOS, headless + system service)
 

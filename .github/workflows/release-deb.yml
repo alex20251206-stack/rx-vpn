@@ -6,6 +6,7 @@
 #   - rx-vpn-macos-0.1.4.sha256
 #   - rx-vpn-windows-offline-0.1.4.zip
 #   - rx-vpn-windows-offline-0.1.4.sha256
+#   - rx-vpn-android-0.1.4-unsigned.apk
 
 name: Release client deb
 
@@ -39,6 +40,25 @@ jobs:
       - name: Build Windows offline bundle
         run: bash scripts/package-windows-offline.sh "${{ github.ref_name }}"
 
+      - name: Set up Java for Android build
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Android release APK (unsigned)
+        working-directory: client/android
+        run: gradle :app:assembleRelease
+
+      - name: Copy Android APK to release assets dir
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          cp client/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+            "client/rx-vpn-android-${VER}-unsigned.apk"
+
       - name: Publish GitHub Release assets
         uses: softprops/action-gh-release@v2
         with:
@@ -48,6 +68,7 @@ jobs:
             client/rx-vpn-macos-*.sha256
             client/rx-vpn-windows-offline-*.zip
             client/rx-vpn-windows-offline-*.sha256
+            client/rx-vpn-android-*-unsigned.apk
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
