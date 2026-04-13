@@ -4,6 +4,8 @@
 #   - rx-vpn-ubuntu_0.1.4-1_all.deb
 #   - rx-vpn-macos-0.1.4.tar.gz
 #   - rx-vpn-macos-0.1.4.sha256
+#   - rx-vpn-windows-offline-0.1.4.zip
+#   - rx-vpn-windows-offline-0.1.4.sha256
 
 name: Release client deb
 
@@ -34,6 +36,9 @@ jobs:
       - name: Build macOS client tarball
         run: bash scripts/package-macos-client.sh "${{ github.ref_name }}"
 
+      - name: Build Windows offline bundle
+        run: bash scripts/package-windows-offline.sh "${{ github.ref_name }}"
+
       - name: Publish GitHub Release assets
         uses: softprops/action-gh-release@v2
         with:
@@ -41,6 +46,8 @@ jobs:
             client/rx-vpn-ubuntu_*_all.deb
             client/rx-vpn-macos-*.tar.gz
             client/rx-vpn-macos-*.sha256
+            client/rx-vpn-windows-offline-*.zip
+            client/rx-vpn-windows-offline-*.sha256
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

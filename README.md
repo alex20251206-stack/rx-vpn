@@ -81,24 +81,31 @@ sudo rx-vpn-ubuntu logs
 
 The macOS client is a CLI command `rx-vpn-macos` (no GUI), using `launchd` system daemons (`/Library/LaunchDaemons`) to keep stunnel + OpenVPN running in the background.
 
-### Install on macOS (Homebrew deps + release tarball)
+### Install on macOS (run one installer script)
 
-After a tag release (`vX.Y.Z`) is pushed, CI uploads `rx-vpn-macos-X.Y.Z.tar.gz` and `rx-vpn-macos-X.Y.Z.sha256` to GitHub Releases.
-
-Install dependencies with Homebrew, then install the client command from the release tarball:
+Run the installer script directly (it installs Homebrew dependencies `openvpn` + `stunnel`, downloads release tarball, verifies SHA256, and installs `rx-vpn-macos`):
 
 ```bash
-brew install openvpn stunnel
-curl -fL -o /tmp/rx-vpn-macos.tar.gz \
-  https://github.com/alex20251206-stack/rx-vpn/releases/download/v0.1.3/rx-vpn-macos-0.1.3.tar.gz
-tar -xzf /tmp/rx-vpn-macos.tar.gz -C /tmp
-sudo install -m 0755 /tmp/rx-vpn-macos /usr/local/bin/rx-vpn-macos
+curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash
 sudo rx-vpn-macos set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
 ```
 
+Install a specific version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash -s -- --version v0.1.3
+```
+
+Install and configure in one step:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | \
+  bash -s -- --sub-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
+```
+
 Notes:
-- Replace `v0.1.3` / `0.1.3` with the release version you want.
 - `set-url` bootstraps two system services: `com.rxvpn.stunnel` and `com.rxvpn.openvpn`.
+- If Homebrew is missing, install it from [brew.sh](https://brew.sh/) first.
 
 ### Commands (daily use)
 
@@ -110,3 +117,62 @@ sudo rx-vpn-macos logs
 ```
 
 `set-url` / `refresh` run as root because they write service files and bootstrap `launchd` system services.
+
+## RX VPN client (Windows, headless + system service)
+
+The Windows client is a PowerShell CLI (`rx-vpn-windows`) with two NSSM-managed services:
+- `RXVPN-Stunnel`
+- `RXVPN-OpenVPN`
+
+### Install in one command (Administrator PowerShell)
+
+```powershell
+irm https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-windows-client.ps1 | iex
+rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
+```
+
+### Offline install (no external download during install)
+
+1) Download from Release:
+- `rx-vpn-windows-offline-X.Y.Z.zip`
+- `rx-vpn-windows-offline-X.Y.Z.sha256`
+
+2) Verify SHA256 and run installer from extracted bundle (Administrator PowerShell):
+
+```powershell
+certutil -hashfile .\rx-vpn-windows-offline-0.1.3.zip SHA256
+Expand-Archive .\rx-vpn-windows-offline-0.1.3.zip -DestinationPath .
+powershell -ExecutionPolicy Bypass -File .\rx-vpn-windows-offline-0.1.3\scripts\install-windows-client.ps1
+rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
+```
+
+Install + configure in one run:
+
+```powershell
+$tmp = Join-Path $env:TEMP "install-rx-vpn-windows.ps1"
+irm https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-windows-client.ps1 -OutFile $tmp
+powershell -ExecutionPolicy Bypass -File $tmp -SubUrl "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
+```
+
+Notes:
+- Run PowerShell as Administrator.
+- Online mode: installer downloads pinned versions from this repository (`third_party/windows`) and verifies SHA256.
+- Offline mode: installer uses bundled files first; no external dependency downloads during install.
+- It installs OpenVPN, stunnel, NSSM, and `rx-vpn-windows`.
+- Default install paths:
+  - `rx-vpn-windows` command files: `C:\Program Files\rx-vpn\`
+  - client state/config/log: `C:\ProgramData\rx-vpn\`
+    - `subscription.url`, `client.ovpn`, `stunnel.conf`, `stunnel-ca.pem`, `client.log`
+  - NSSM: `C:\Program Files\nssm\`
+  - OpenVPN (MSI default): `C:\Program Files\OpenVPN\`
+  - stunnel (installer default): `C:\Program Files (x86)\stunnel\`
+  - Services: `RXVPN-Stunnel` and `RXVPN-OpenVPN`
+
+### Commands
+
+```powershell
+rx-vpn-windows status
+rx-vpn-windows refresh
+rx-vpn-windows disable
+rx-vpn-windows logs
+```
