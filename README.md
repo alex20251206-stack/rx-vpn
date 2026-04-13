@@ -119,7 +119,7 @@ sudo rx-vpn-macos set-url 'http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>'
 Install a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash -s -- --version v0.1.7
+curl -fsSL https://raw.githubusercontent.com/alex20251206-stack/rx-vpn/main/scripts/install-macos-client.sh | bash -s -- --version v0.1.8
 ```
 
 Install and configure in one step:
@@ -160,15 +160,15 @@ rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
 ### Offline install (no external download during install)
 
 1) Download from Release:
-- `rx-vpn-windows-offline-0.1.7.zip`
-- `rx-vpn-windows-offline-0.1.7.sha256`
+- `rx-vpn-windows-offline-0.1.8.zip`
+- `rx-vpn-windows-offline-0.1.8.sha256`
 
 2) Verify SHA256 and run installer from extracted bundle (Administrator PowerShell):
 
 ```powershell
-certutil -hashfile .\rx-vpn-windows-offline-0.1.7.zip SHA256
-Expand-Archive .\rx-vpn-windows-offline-0.1.7.zip -DestinationPath .
-powershell -ExecutionPolicy Bypass -File .\rx-vpn-windows-offline-0.1.7\scripts\install-windows-client.ps1
+certutil -hashfile .\rx-vpn-windows-offline-0.1.8.zip SHA256
+Expand-Archive .\rx-vpn-windows-offline-0.1.8.zip -DestinationPath .
+powershell -ExecutionPolicy Bypass -File .\rx-vpn-windows-offline-0.1.8\scripts\install-windows-client.ps1
 rx-vpn-windows set-url "http://<OVPN_REMOTE_HOST>:8139/api/sub/<sub-code>"
 ```
 
